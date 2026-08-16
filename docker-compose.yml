@@ -1,0 +1,56 @@
+services:
+  payload:
+    image: node:20-alpine
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/home/node/app
+      - node_modules:/home/node/app/node_modules
+    working_dir: /home/node/app/
+    command: sh -c "corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm dev"
+    depends_on:
+      - libsql
+      - minio
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: http://libsql:8080
+      R2_ENDPOINT: http://minio:9000
+
+  libsql:
+    image: ghcr.io/tursodatabase/libsql-server:latest
+    ports:
+      - '8080:8080'
+    environment:
+      SQLD_NODE: primary
+    volumes:
+      - libsql-data:/var/lib/sqld
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio-data:/data
+
+  # Creates the dev-bucket in MinIO on startup (mirrors R2_BUCKET in .env.example)
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      sh -c "
+      until mc alias set local http://minio:9000 minioadmin minioadmin; do sleep 1; done;
+      mc mb -p local/dev-bucket;
+      exit 0;
+      "
+
+volumes:
+  libsql-data:
+  minio-data:
+  node_modules:
