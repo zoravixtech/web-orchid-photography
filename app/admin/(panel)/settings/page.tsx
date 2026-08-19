@@ -1,0 +1,24 @@
+import SettingsForm from "@/components/admin/SettingsForm";
+import { getSiteSettings } from "@/lib/data/settings";
+
+export default async function AdminSettingsPage() {
+    const settings = await getSiteSettings();
+
+    return (
+        <div className="max-w-3xl">
+            <header className="mb-8">
+                <h1 className="text-2xl font-serif font-bold text-slate-900">Settings</h1>
+                <p className="text-sm text-slate-500 mt-1">
+                    Customize the branding shown across the public website.
+                </p>
+            </header>
+
+            <SettingsForm
+                logoUrl={settings.logoUrl ?? ""}
+                heroVideoUrl={settings.heroVideoUrl ?? ""}
+                stats={settings.stats}
+                socialLinks={settings.socialLinks}
+            />
+        </div>
+    );
+}

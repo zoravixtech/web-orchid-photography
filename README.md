@@ -1,60 +1,36 @@
-# Zoravix Photography Template
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Payload CMS template for photography sites. SQLite/libsql database, Cloudflare R2 media storage.
+## Getting Started
 
-## Stack
+First, run the development server:
 
-- **Payload 3** + Next.js
-- **Database**: SQLite via `@payloadcms/db-sqlite` (local file or remote libsql server)
-- **Media storage**: `@payloadcms/storage-s3` pointed at Cloudflare R2's S3-compatible API
-
-## Quick start
-
-1. `cp .env.example .env` and fill in `PAYLOAD_SECRET` (any random string for dev)
-2. `pnpm install && pnpm dev`
-3. Open `http://localhost:3000/admin` and create your first admin user
-
-By default `DATABASE_URL=file:./payload.db` (local SQLite file, zero setup) and R2 vars point at a local MinIO instance — see [Docker](#docker) if you want those running too. For production, swap `DATABASE_URL` for a remote libsql/Turso URL and fill in real R2 credentials.
-
-### Cloudflare R2 setup (production)
-
-1. Create a bucket in the Cloudflare dashboard (R2 → Create bucket)
-2. Create an API token (R2 → Manage API Tokens) scoped to that bucket
-3. Set in `.env`:
-   ```
-   R2_BUCKET=your-bucket-name
-   R2_ACCESS_KEY_ID=...
-   R2_SECRET_ACCESS_KEY=...
-   R2_ENDPOINT=https://<ACCOUNT_ID>.r2.cloudflarestorage.com
-   ```
-
-## Docker
-
-`docker-compose.yml` runs the full dev stack: the app, a `libsql-server` database, and a `minio` service standing in for R2 (S3-compatible, no real Cloudflare account needed).
-
-```
-docker compose up
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-This starts:
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-- `payload` — the app on `http://localhost:3000`
-- `libsql` — database on port `8080`
-- `minio` — S3-compatible storage on `9000` (API) and `9001` (console, login `minioadmin`/`minioadmin`)
-- `minio-init` — one-shot job that creates the `dev-bucket` used by `.env.example`
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## Collections
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-- **Users** — auth-enabled, admin panel access. See [Authentication docs](https://payloadcms.com/docs/authentication/overview).
-- **Media** — uploads collection, stored in R2/MinIO via the S3 storage adapter.
+## Learn More
 
-## Production
+To learn more about Next.js, take a look at the following resources:
 
-```
-pnpm build
-pnpm start
-```
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## Questions
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-[Payload Docs](https://payloadcms.com/docs) · [Discord](https://discord.com/invite/payload)
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
