@@ -27,7 +27,7 @@ const rightNavItems: NavItem[] = [
 
 export default function Navbar({ logoUrl }: { logoUrl?: string | null }) {
     const [isScrolled, setIsScrolled] = useState(false);
-    const [activeSection, setActiveSection] = useState("home");
+    const [activeSection, setActiveSection] = useState<string | null>(null);
     const pathname = usePathname();
 
     useEffect(() => {
@@ -52,11 +52,10 @@ export default function Navbar({ logoUrl }: { logoUrl?: string | null }) {
 
         const observer = new IntersectionObserver(
             (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        setActiveSection(entry.target.id);
-                    }
-                });
+                const visible = entries
+                    .filter((entry) => entry.isIntersecting)
+                    .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+                if (visible) setActiveSection(visible.target.id);
             },
             { threshold: 0.3 }
         );
@@ -95,12 +94,11 @@ export default function Navbar({ logoUrl }: { logoUrl?: string | null }) {
     };
 
     const renderNavLink = (item: NavItem) => {
-        const isCurrentRoute =
+        const isActive =
+            (item.id === "home" && pathname === "/" && (activeSection === null || activeSection === "home")) ||
             (item.id === "kidography" && pathname === "/kidography") ||
             (item.id === "blog" && pathname.startsWith("/blog")) ||
-            (item.id === "home" && pathname === "/");
-
-        const isActive = isCurrentRoute || activeSection === item.id || (item.id === "carrer" && activeSection === "about");
+            (item.id !== "carrer" && pathname === "/" && activeSection === item.id);
 
         return (
             <Link

@@ -1,42 +1,42 @@
-import Link from "next/link";
-import BlogList from "@/components/admin/BlogList";
-import { listBlogsForAdmin } from "@/lib/data/admin";
+import Link from 'next/link'
+import BlogList from '@/components/admin/BlogList'
+import { listBlogsForAdmin } from '@/lib/data/admin'
 
 export default async function AdminBlogsPage() {
-    const blogs = await listBlogsForAdmin();
+  const blogs = await listBlogsForAdmin()
 
-    return (
-        <div className="max-w-5xl">
-            <header className="mb-8 flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-serif font-bold text-slate-900">Blogs</h1>
-                    <p className="text-sm text-slate-500 mt-1">
-                        Create, edit and manage blog posts shown on the website.
-                    </p>
-                </div>
-                <Link
-                    href="/admin/blogs/new"
-                    className="inline-flex items-center gap-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold px-5 py-2.5 transition-colors"
-                >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                    New Blog
-                </Link>
-            </header>
-
-            {blogs.length === 0 ? (
-                <div className="bg-white rounded-xl border border-dashed border-slate-300 p-12 text-center">
-                    <p className="text-sm text-slate-500">
-                        No blog posts yet.{" "}
-                        <Link href="/admin/blogs/new" className="font-semibold text-purple-600 hover:underline">
-                            Create the first one
-                        </Link>
-                    </p>
-                </div>
-            ) : (
-                <BlogList blogs={blogs} />
-            )}
+  return (
+    <div className="w-full">
+      <header className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-serif font-bold text-slate-900">Blogs</h1>
+          <p className="text-sm text-slate-500 mt-1">
+            Create, edit and manage blog posts shown on the website.
+          </p>
         </div>
-    );
+        <Link
+          href="/admin/blogs/new"
+          className="inline-flex items-center gap-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold px-5 py-2.5 transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          New Blog
+        </Link>
+      </header>
+
+      {blogs.length === 0 ? (
+        <div className="bg-white rounded-xl border border-dashed border-slate-300 p-12 text-center">
+          <p className="text-sm text-slate-500">
+            No blog posts yet.{' '}
+            <Link href="/admin/blogs/new" className="font-semibold text-purple-600 hover:underline">
+              Create the first one
+            </Link>
+          </p>
+        </div>
+      ) : (
+        <BlogList blogs={blogs} />
+      )}
+    </div>
+  )
 }
