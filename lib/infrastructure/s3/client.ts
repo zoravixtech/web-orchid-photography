@@ -20,6 +20,11 @@ export function getS3Client(): S3Client | null {
                 accessKeyId: env.STORAGE_ACCESS_KEY_ID!,
                 secretAccessKey: env.STORAGE_SECRET_ACCESS_KEY!,
             },
+            // The SDK's default ("WHEN_SUPPORTED") computes a request checksum
+            // for PutObject even when presigning — since no body exists yet at
+            // presign time, it signs the checksum of an *empty* payload into the
+            // URL, which then fails once the browser PUTs the real file bytes.
+            requestChecksumCalculation: "WHEN_REQUIRED",
         });
     }
     return client;

@@ -4,8 +4,9 @@ import type {
     GalleryRepository,
 } from "@/lib/repositories/galleryRepository";
 import type { GalleryMediaItem, GallerySection } from "@/lib/types";
+import { normalizeMediaUrl } from "@/lib/utils/mediaUrl";
 
-interface GalleryDoc {
+export interface GalleryDoc {
     id: string | number;
     section: string;
     url: string;
@@ -14,11 +15,11 @@ interface GalleryDoc {
     createdAt: string;
 }
 
-function mapDoc(doc: GalleryDoc): GalleryMediaItem {
+export function mapGalleryDoc(doc: GalleryDoc): GalleryMediaItem {
     return {
         id: String(doc.id),
         section: doc.section as GallerySection,
-        url: doc.url,
+        url: normalizeMediaUrl(doc.url, doc.storagePath),
         alt: doc.alt ?? "",
         storagePath: doc.storagePath ?? null,
         createdAt: doc.createdAt,
@@ -36,7 +37,7 @@ export class PayloadGalleryRepository implements GalleryRepository {
             sort: "-createdAt",
             limit: 0,
         });
-        return (docs as GalleryDoc[]).map(mapDoc);
+        return (docs as GalleryDoc[]).map(mapGalleryDoc);
     }
 
     async createMany(items: CreateGalleryMediaInput[]): Promise<GalleryMediaItem[]> {
@@ -49,7 +50,7 @@ export class PayloadGalleryRepository implements GalleryRepository {
                 })
             )
         );
-        return (created as GalleryDoc[]).map(mapDoc);
+        return (created as GalleryDoc[]).map(mapGalleryDoc);
     }
 
     async delete(id: string): Promise<GalleryMediaItem | null> {
@@ -59,7 +60,7 @@ export class PayloadGalleryRepository implements GalleryRepository {
                 collection: "gallery-media",
                 id,
             })) as GalleryDoc;
-            return mapDoc(doc);
+            return mapGalleryDoc(doc);
         } catch {
             return null;
         }

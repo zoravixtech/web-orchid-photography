@@ -6,26 +6,24 @@ import WhyChooseUsSection from "@/components/WhyChooseUsSection";
 import StatsCounterSection from "@/components/StatsCounterSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import BlogsSection from "@/components/BlogsSection";
-import { getSiteSettings, getGalleryMedia } from "@/lib/data/settings";
+import { getSiteSettings, getGalleryMedia, getHeroCarouselMedia } from "@/lib/data/settings";
 import { getBlogs } from "@/lib/data/blogs";
 
 // Serve cached HTML for a long time; content is invalidated on-demand from the admin panel.
 export const revalidate = 86400;
 
-// Only the most recent few gallery uploads are used for the hero carousel.
-const HERO_SLIDE_COUNT = 5;
-
 export default async function Home() {
-    const [settings, galleryImages, blogPosts] = await Promise.all([
+    const [settings, galleryImages, heroImages, blogPosts] = await Promise.all([
         getSiteSettings(),
         getGalleryMedia("gallery"),
+        getHeroCarouselMedia(),
         getBlogs(),
     ]);
 
     return (
         <>
-            {/* Home (Hero) Section with automatic background image slider, sourced from the gallery */}
-            <HeroSlider images={galleryImages.slice(0, HERO_SLIDE_COUNT)} />
+            {/* Home (Hero) Section with automatic background image slider, curated in the admin panel */}
+            <HeroSlider images={heroImages} />
 
             {/* 3-Column Photography Services Grid Section, images sourced from the gallery */}
             <ServicesSection images={galleryImages} />

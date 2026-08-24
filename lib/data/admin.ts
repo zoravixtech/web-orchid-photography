@@ -1,4 +1,4 @@
-import { getBlogRepository, getGalleryRepository } from "@/lib/infrastructure";
+import { getBlogRepository, getGalleryRepository, getHeroCarouselRepository } from "@/lib/infrastructure";
 import type { BlogPost, GalleryMediaItem } from "@/lib/types";
 
 // Uncached, fresh reads used by the admin panel (which always renders dynamically).
@@ -12,11 +12,17 @@ export async function listGalleryMedia(): Promise<GalleryMediaItem[]> {
 export async function getGalleryForAdmin(): Promise<{
     gallery: GalleryMediaItem[];
     kids: GalleryMediaItem[];
+    heroCarouselIds: string[];
 }> {
-    const all = await listGalleryMedia();
+    const heroRepo = getHeroCarouselRepository();
+    const [all, heroCarouselIds] = await Promise.all([
+        listGalleryMedia(),
+        heroRepo ? heroRepo.listSelectedIds() : Promise.resolve([]),
+    ]);
     return {
         gallery: all.filter((item) => item.section === "gallery"),
         kids: all.filter((item) => item.section === "kids"),
+        heroCarouselIds,
     };
 }
 

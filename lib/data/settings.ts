@@ -1,8 +1,9 @@
 import { unstable_cache } from "next/cache";
-import { getSettingsRepository, getGalleryRepository } from "@/lib/infrastructure";
+import { getSettingsRepository, getGalleryRepository, getHeroCarouselRepository } from "@/lib/infrastructure";
 import type { GalleryMediaItem, GallerySection, SiteSettings } from "@/lib/types";
 
 export const GALLERY_TAG = "gallery";
+export const HERO_CAROUSEL_TAG = "hero-carousel";
 
 const DEFAULT_STATS: SiteSettings["stats"] = {
     weddings: 800,
@@ -53,4 +54,14 @@ export const getGalleryMedia = unstable_cache(
     },
     ["gallery-media"],
     { revalidate: 86400, tags: [GALLERY_TAG] }
+);
+
+export const getHeroCarouselMedia = unstable_cache(
+    async (): Promise<GalleryMediaItem[]> => {
+        const repo = getHeroCarouselRepository();
+        if (!repo) return [];
+        return repo.listSelectedMedia();
+    },
+    ["hero-carousel-media"],
+    { revalidate: 86400, tags: [HERO_CAROUSEL_TAG] }
 );

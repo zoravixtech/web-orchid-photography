@@ -4,6 +4,8 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { updateSettings } from "@/app/admin/actions/settings";
+import { finalizeUpload } from "@/app/admin/actions/upload";
+import { uploadFileDirect } from "@/lib/uploadClient";
 import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL, formatBytes } from "@/lib/uploadLimits";
 import { useToast } from "@/components/admin/Toast";
 import type { SocialLinks, StatsCounters } from "@/lib/types";
@@ -30,18 +32,11 @@ const SOCIAL_FIELDS: { key: keyof SocialLinks; label: string; placeholder: strin
     { key: "linkedin", label: "LinkedIn", placeholder: "https://linkedin.com/company/yourcompany" },
 ];
 
-async function uploadFile(
-    kind: "logo" | "video",
-    file: File
-): Promise<string> {
-    const formData = new FormData();
-    formData.append("kind", kind);
-    formData.append("files", file);
-
-    const res = await fetch("/api/upload", { method: "POST", body: formData });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error ?? "Upload failed");
-    return data.items[0].url as string;
+async function uploadFile(kind: "logo" | "video", file: File): Promise<string> {
+    const { key, publicUrl } = await uploadFileDirect(kind, file);
+    const result = await finalizeUpload(kind, [{ key, publicUrl, alt: file.name || "" }]);
+    if (result.error) throw new Error(result.error);
+    return publicUrl;
 }
 
 export default function SettingsForm({ logoUrl, heroVideoUrl, stats, socialLinks }: SettingsFormProps) {
@@ -55,7 +50,7 @@ export default function SettingsForm({ logoUrl, heroVideoUrl, stats, socialLinks
     const videoInputRef = useRef<HTMLInputElement>(null);
 
     const handleUpload = async (kind: "logo" | "video", file: File) => {
-        if (file.size > MAX_UPLOAD_BYTES) {
+        if (kind === "logo" && file.size > MAX_UPLOAD_BYTES) {
             toast.error(`"${file.name}" is ${formatBytes(file.size)}, which is over the ${MAX_UPLOAD_LABEL} limit.`);
             return;
         }

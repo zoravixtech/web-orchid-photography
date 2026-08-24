@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3002",
+    "dev": "next dev -p 3000",
     "build": "next build --webpack",
     "postbuild": "node scripts/fix-next-symlinks.mjs",
     "start": "next start",
@@ -11,7 +11,8 @@
     "seed": "payload run scripts/seed.mts"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1113.0",
+    "@aws-sdk/client-s3": "^3.1116.0",
+    "@aws-sdk/s3-request-presigner": "^3.1116.0",
     "@payloadcms/db-sqlite": "^3.88.0",
     "jose": "^6.2.9",
     "next": "16.3.1",

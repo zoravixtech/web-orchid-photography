@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     blogs: Blog;
     'gallery-media': GalleryMedia;
+    'hero-carousel': HeroCarousel;
     'payload-kv': PayloadKv;
     users: User;
     'payload-locked-documents': PayloadLockedDocument;
@@ -79,6 +80,7 @@ export interface Config {
   collectionsSelect: {
     blogs: BlogsSelect<false> | BlogsSelect<true>;
     'gallery-media': GalleryMediaSelect<false> | GalleryMediaSelect<true>;
+    'hero-carousel': HeroCarouselSelect<false> | HeroCarouselSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -162,6 +164,16 @@ export interface GalleryMedia {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hero-carousel".
+ */
+export interface HeroCarousel {
+  id: number;
+  media: number | GalleryMedia;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -216,6 +228,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'gallery-media';
         value: number | GalleryMedia;
+      } | null)
+    | ({
+        relationTo: 'hero-carousel';
+        value: number | HeroCarousel;
       } | null)
     | ({
         relationTo: 'users';
@@ -287,6 +303,15 @@ export interface GalleryMediaSelect<T extends boolean = true> {
   url?: T;
   alt?: T;
   storagePath?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hero-carousel_select".
+ */
+export interface HeroCarouselSelect<T extends boolean = true> {
+  media?: T;
   updatedAt?: T;
   createdAt?: T;
 }

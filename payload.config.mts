@@ -2,6 +2,7 @@ import { sqliteAdapter } from "@payloadcms/db-sqlite";
 import { buildConfig } from "payload";
 import { Blogs } from "./lib/infrastructure/payload/collections/Blogs.ts";
 import { GalleryMedia } from "./lib/infrastructure/payload/collections/GalleryMedia.ts";
+import { HeroCarousel } from "./lib/infrastructure/payload/collections/HeroCarousel.ts";
 import { SiteSettings } from "./lib/infrastructure/payload/globals/SiteSettings.ts";
 
 /**
@@ -22,7 +23,7 @@ export default buildConfig({
         // rely on dev-mode schema push, not the migration CLI).
         migrationDir: "migrations",
     }),
-    collections: [Blogs, GalleryMedia],
+    collections: [Blogs, GalleryMedia, HeroCarousel],
     globals: [SiteSettings],
     typescript: {
         outputFile: "lib/infrastructure/payload/payload-types.ts",

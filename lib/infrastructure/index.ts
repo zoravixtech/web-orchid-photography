@@ -2,12 +2,14 @@ import { getPayloadClient } from "@/lib/infrastructure/payload/client";
 import { PayloadSettingsRepository } from "@/lib/infrastructure/payload/settingsRepository";
 import { PayloadGalleryRepository } from "@/lib/infrastructure/payload/galleryRepository";
 import { PayloadBlogRepository } from "@/lib/infrastructure/payload/blogRepository";
+import { PayloadHeroCarouselRepository } from "@/lib/infrastructure/payload/heroCarouselRepository";
 import { getS3Client } from "@/lib/infrastructure/s3/client";
 import { S3MediaStorage } from "@/lib/infrastructure/s3/mediaStorage";
 import { env } from "@/lib/config/env";
 import type { SettingsRepository } from "@/lib/repositories/settingsRepository";
 import type { GalleryRepository } from "@/lib/repositories/galleryRepository";
 import type { BlogRepository } from "@/lib/repositories/blogRepository";
+import type { HeroCarouselRepository } from "@/lib/repositories/heroCarouselRepository";
 import type { MediaStorage } from "@/lib/storage/mediaStorage";
 
 export function getSettingsRepository(): SettingsRepository | null {
@@ -18,6 +20,11 @@ export function getSettingsRepository(): SettingsRepository | null {
 export function getGalleryRepository(): GalleryRepository | null {
     const payload = getPayloadClient();
     return payload ? new PayloadGalleryRepository(payload) : null;
+}
+
+export function getHeroCarouselRepository(): HeroCarouselRepository | null {
+    const payload = getPayloadClient();
+    return payload ? new PayloadHeroCarouselRepository(payload) : null;
 }
 
 export function getBlogRepository(): BlogRepository | null {

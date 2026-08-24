@@ -19,13 +19,15 @@ interface BlogDoc {
     updatedAt: string;
 }
 
+import { normalizeMediaUrl } from "@/lib/utils/mediaUrl";
+
 function mapDoc(doc: BlogDoc): BlogPost {
     return {
         id: String(doc.id),
         slug: doc.slug,
         title: doc.title,
         date: doc.date,
-        image: doc.image,
+        image: normalizeMediaUrl(doc.image),
         excerpt: doc.excerpt,
         views: doc.views ?? 0,
         content: Array.isArray(doc.content) ? (doc.content as BlogBlock[]) : [],

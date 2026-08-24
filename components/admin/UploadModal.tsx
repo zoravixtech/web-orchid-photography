@@ -3,6 +3,8 @@
 import { useRef, useState } from "react";
 import type { GallerySection } from "@/lib/types";
 import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL, formatBytes } from "@/lib/uploadLimits";
+import { uploadFileDirect } from "@/lib/uploadClient";
+import { finalizeUpload } from "@/app/admin/actions/upload";
 import { useToast } from "@/components/admin/Toast";
 
 interface UploadModalProps {
@@ -41,16 +43,27 @@ export default function UploadModal({ open, section, onClose, onUploaded }: Uplo
         setUploading(true);
         setProgress(0);
 
-        const formData = new FormData();
-        formData.append("kind", section);
-        files.forEach((file) => formData.append("files", file));
+        const perFileProgress = new Array(files.length).fill(0);
+        const updateProgress = () => {
+            const total = perFileProgress.reduce((sum, value) => sum + value, 0);
+            setProgress(total / files.length);
+        };
 
         try {
-            const res = await fetch("/api/upload", { method: "POST", body: formData });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error ?? "Upload failed");
-            setProgress(1);
-            toast.success(`${data.items.length} file${data.items.length === 1 ? "" : "s"} uploaded.`);
+            const uploaded = await Promise.all(
+                files.map(async (file, index) => {
+                    const { key, publicUrl } = await uploadFileDirect(section, file, (fraction) => {
+                        perFileProgress[index] = fraction;
+                        updateProgress();
+                    });
+                    return { key, publicUrl, alt: file.name || "" };
+                })
+            );
+
+            const result = await finalizeUpload(section, uploaded);
+            if (result.error) throw new Error(result.error);
+
+            toast.success(`${files.length} file${files.length === 1 ? "" : "s"} uploaded.`);
             setFiles([]);
             onUploaded();
             onClose();

@@ -5,6 +5,11 @@ const remotePatterns: NonNullable<NextConfig["images"]>["remotePatterns"] = [
     protocol: "https",
     hostname: "images.unsplash.com",
   },
+  // Cloudflare R2's public "r2.dev" dev URLs (https://pub-<hash>.r2.dev/...).
+  {
+    protocol: "https",
+    hostname: "*.r2.dev",
+  },
 ];
 
 const storagePublicUrlBase = process.env.STORAGE_PUBLIC_URL_BASE;

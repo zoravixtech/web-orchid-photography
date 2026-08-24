@@ -4,6 +4,7 @@ import type {
     UpdateSiteSettingsInput,
 } from "@/lib/repositories/settingsRepository";
 import type { SiteSettings } from "@/lib/types";
+import { normalizeMediaUrl } from "@/lib/utils/mediaUrl";
 
 interface SiteSettingsDoc {
     logoUrl: string | null;
@@ -22,8 +23,8 @@ export class PayloadSettingsRepository implements SettingsRepository {
         })) as SiteSettingsDoc;
 
         return {
-            logoUrl: doc.logoUrl ?? null,
-            heroVideoUrl: doc.heroVideoUrl ?? null,
+            logoUrl: doc.logoUrl ? normalizeMediaUrl(doc.logoUrl) : null,
+            heroVideoUrl: doc.heroVideoUrl ? normalizeMediaUrl(doc.heroVideoUrl) : null,
             stats: doc.stats,
             socialLinks: doc.socialLinks,
         };

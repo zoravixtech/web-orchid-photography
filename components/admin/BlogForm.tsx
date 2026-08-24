@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import BlockEditor from '@/components/admin/BlockEditor'
 import type { BlogBlock, BlogPost } from '@/lib/types'
 import type { BlogActionResult } from '@/app/admin/actions/blogs'
+import { uploadFileDirect } from '@/lib/uploadClient'
 import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL, formatBytes } from '@/lib/uploadLimits'
 import { useToast } from '@/components/admin/Toast'
 
@@ -57,14 +58,8 @@ export default function BlogForm({
     }
     setUploading(true)
     try {
-      const formData = new FormData()
-      formData.append('kind', 'blog')
-      formData.append('files', file)
-
-      const res = await fetch('/api/upload', { method: 'POST', body: formData })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error ?? 'Upload failed')
-      setImage(data.items[0].url as string)
+      const { publicUrl } = await uploadFileDirect('blog', file)
+      setImage(publicUrl)
       toast.success('Cover image uploaded.')
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Upload failed')
