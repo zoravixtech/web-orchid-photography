@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -30,6 +31,46 @@ function BlogBlockRenderer({ blocks }: { blocks: BlogBlock[] }) {
             )}
         </article>
     );
+}
+
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+    const { slug } = await params;
+    const post = await getBlogBySlug(slug);
+    if (!post) return { title: "Blog Post Not Found" };
+
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://web-orchid-photography.vercel.app";
+    const pageUrl = `${siteUrl}/blog/${post.slug}`;
+
+    return {
+        title: post.title,
+        description: post.excerpt,
+        alternates: {
+            canonical: pageUrl,
+        },
+        openGraph: {
+            title: post.title,
+            description: post.excerpt,
+            url: pageUrl,
+            type: "article",
+            publishedTime: post.date,
+            images: [
+                {
+                    url: post.image,
+                    alt: post.title,
+                },
+            ],
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: post.title,
+            description: post.excerpt,
+            images: [post.image],
+        },
+    };
 }
 
 export default async function BlogDetailPage({
