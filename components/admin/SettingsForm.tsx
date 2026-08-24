@@ -168,6 +168,7 @@ export default function SettingsForm({ logoUrl, heroVideoUrl, stats, socialLinks
                             onChange={(e) => setVideo(e.target.value)}
                             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                             placeholder="https://... or upload a video below"
+                            disabled
                         />
                     </div>
 
@@ -176,7 +177,6 @@ export default function SettingsForm({ logoUrl, heroVideoUrl, stats, socialLinks
                             key={video}
                             src={video}
                             controls
-                            muted
                             playsInline
                             className="w-full aspect-video rounded-xl bg-black object-cover"
                         />
