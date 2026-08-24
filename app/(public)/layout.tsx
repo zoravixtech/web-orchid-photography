@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FloatingSocialLinks from "@/components/FloatingSocialLinks";
+import LeadModal from "@/components/LeadModal";
 import { getSiteSettings } from "@/lib/data/settings";
 
 export default async function PublicLayout({
@@ -12,6 +13,7 @@ export default async function PublicLayout({
 
     return (
         <>
+            <LeadModal />
             <FloatingSocialLinks socialLinks={settings.socialLinks} />
             <Navbar logoUrl={settings.logoUrl} />
             <main className="grow">{children}</main>
