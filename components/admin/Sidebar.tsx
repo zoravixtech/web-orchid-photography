@@ -6,7 +6,7 @@ import { logout } from "@/app/admin/actions/auth";
 
 const navItems = [
     {
-        href: "/admin/settings",
+        href: "/admin",
         label: "Settings",
         icon: (
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
