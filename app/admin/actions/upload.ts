@@ -3,24 +3,12 @@
 import { revalidatePath, updateTag } from "next/cache";
 import { getGalleryRepository, getMediaStorage, getSettingsRepository } from "@/lib/infrastructure";
 import { getSession } from "@/lib/auth/session";
-import { GALLERY_TAG } from "@/lib/data/settings";
+import { GALLERY_TAG, SETTINGS_TAG } from "@/lib/data/settings";
 import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL, formatBytes } from "@/lib/uploadLimits";
-import type { GallerySection } from "@/lib/types";
+import { ALLOWED_KINDS, IMAGE_TYPES, VIDEO_TYPES, isVideoKind, type UploadKind } from "@/lib/uploadKinds";
+import type { GalleryMediaItem, GallerySection } from "@/lib/types";
 
-export type UploadKind = "gallery" | "kids" | "logo" | "video" | "blog";
-
-const ALLOWED_KINDS: UploadKind[] = ["gallery", "kids", "logo", "video", "blog"];
-
-const IMAGE_TYPES = new Set([
-    "image/png",
-    "image/jpeg",
-    "image/webp",
-    "image/avif",
-    "image/gif",
-    "image/svg+xml",
-]);
-
-const VIDEO_TYPES = new Set(["video/mp4", "video/webm", "video/quicktime"]);
+export type { UploadKind };
 
 function extensionFromName(name: string, fallback: string): string {
     const match = /\.([a-zA-Z0-9]+)$/.exec(name);
@@ -47,8 +35,10 @@ export interface UploadUrlError {
 
 /**
  * Issues a presigned R2/S3 PUT URL so the browser can upload the file bytes
- * directly to the bucket — the file never passes through this server, which
- * is what lets video uploads exceed Vercel's ~4.5MB Route Handler body limit.
+ * (video is client-side transcoded if applicable — see lib/videoCompression.ts)
+ * directly to the bucket. The file never passes through this server: that's
+ * what keeps large uploads off this app's server entirely, both for Vercel's
+ * request body limits and for server CPU/memory.
  */
 export async function createUploadUrl(
     input: UploadUrlRequest
@@ -60,7 +50,7 @@ export async function createUploadUrl(
         return { error: `Invalid kind: ${input.kind}` };
     }
 
-    const isVideo = input.kind === "video";
+    const isVideo = isVideoKind(input.kind);
     const allowedTypes = isVideo ? VIDEO_TYPES : IMAGE_TYPES;
     if (!allowedTypes.has(input.contentType)) {
         return { error: `Unsupported file type for ${input.kind}: ${input.contentType}` };
@@ -91,7 +81,7 @@ export interface FinalizeUploadItem {
 }
 
 export interface FinalizeUploadResult {
-    items?: { id?: string; url: string }[];
+    items?: (GalleryMediaItem | { url: string })[];
     error?: string;
 }
 
@@ -125,18 +115,23 @@ export async function finalizeUpload(
         revalidatePath("/");
         revalidatePath("/kidography");
 
-        return { items: created.map((row) => ({ id: row.id, url: row.url })) };
+        return { items: created };
     }
 
-    if (kind === "logo" || kind === "video") {
+    if (kind === "logo" || kind === "video" || kind === "kidsVideo") {
         const settingsRepo = getSettingsRepository();
         if (!settingsRepo) return { error: "Database is not configured." };
 
-        await settingsRepo.update(
-            kind === "logo" ? { logoUrl: items[0].publicUrl } : { heroVideoUrl: items[0].publicUrl }
-        );
-        updateTag("settings");
+        const patch =
+            kind === "logo"
+                ? { logoUrl: items[0].publicUrl }
+                : kind === "video"
+                    ? { heroVideoUrl: items[0].publicUrl }
+                    : { kidsHeroVideoUrl: items[0].publicUrl };
+        await settingsRepo.update(patch);
+        updateTag(SETTINGS_TAG);
         revalidatePath("/");
+        revalidatePath("/kidography");
 
         return { items: [{ url: items[0].publicUrl }] };
     }

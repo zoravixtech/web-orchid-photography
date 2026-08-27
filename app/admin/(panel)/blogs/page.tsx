@@ -25,18 +25,7 @@ export default async function AdminBlogsPage() {
         </Link>
       </header>
 
-      {blogs.length === 0 ? (
-        <div className="bg-white rounded-xl border border-dashed border-slate-300 p-12 text-center">
-          <p className="text-sm text-slate-500">
-            No blog posts yet.{' '}
-            <Link href="/admin/blogs/new" className="font-semibold text-purple-600 hover:underline">
-              Create the first one
-            </Link>
-          </p>
-        </div>
-      ) : (
-        <BlogList blogs={blogs} />
-      )}
+      <BlogList initialBlogs={blogs} />
     </div>
   )
 }

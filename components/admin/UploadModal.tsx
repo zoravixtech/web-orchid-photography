@@ -1,17 +1,16 @@
 "use client";
 
 import { useRef, useState } from "react";
-import type { GallerySection } from "@/lib/types";
-import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL, formatBytes } from "@/lib/uploadLimits";
-import { uploadFileDirect } from "@/lib/uploadClient";
-import { finalizeUpload } from "@/app/admin/actions/upload";
+import type { GallerySection, GalleryMediaItem } from "@/lib/types";
+import { uploadFile } from "@/lib/uploadClient";
+import { mapWithConcurrencyLimit } from "@/lib/concurrency";
 import { useToast } from "@/components/admin/Toast";
 
 interface UploadModalProps {
     open: boolean;
     section: GallerySection;
     onClose: () => void;
-    onUploaded: () => void;
+    onUploaded: (items: GalleryMediaItem[]) => void;
 }
 
 export default function UploadModal({ open, section, onClose, onUploaded }: UploadModalProps) {
@@ -25,17 +24,7 @@ export default function UploadModal({ open, section, onClose, onUploaded }: Uplo
 
     const addFiles = (list: FileList | null) => {
         if (!list) return;
-        const incoming = Array.from(list);
-        const tooLarge = incoming.filter((file) => file.size > MAX_UPLOAD_BYTES);
-        const accepted = incoming.filter((file) => file.size <= MAX_UPLOAD_BYTES);
-
-        tooLarge.forEach((file) => {
-            toast.error(`"${file.name}" is ${formatBytes(file.size)}, which is over the ${MAX_UPLOAD_LABEL} limit.`);
-        });
-
-        if (accepted.length > 0) {
-            setFiles((prev) => [...prev, ...accepted]);
-        }
+        setFiles((prev) => [...prev, ...Array.from(list)]);
     };
 
     const handleUpload = async () => {
@@ -50,22 +39,23 @@ export default function UploadModal({ open, section, onClose, onUploaded }: Uplo
         };
 
         try {
-            const uploaded = await Promise.all(
-                files.map(async (file, index) => {
-                    const { key, publicUrl } = await uploadFileDirect(section, file, (fraction) => {
-                        perFileProgress[index] = fraction;
-                        updateProgress();
-                    });
-                    return { key, publicUrl, alt: file.name || "" };
+            // Bounded concurrency prevents overwhelming browser network connections
+            // during large batch uploads (see lib/concurrency.ts). Each result already
+            // comes back as a full GalleryMediaItem row, persisted server-side.
+            const uploaded = await mapWithConcurrencyLimit(files, 3, (file, index) =>
+                uploadFile(section, file, file.name || "", (fraction) => {
+                    perFileProgress[index] = fraction;
+                    updateProgress();
                 })
             );
 
-            const result = await finalizeUpload(section, uploaded);
-            if (result.error) throw new Error(result.error);
+            const items = uploaded
+                .map((result) => result.galleryItem)
+                .filter((item): item is GalleryMediaItem => item !== undefined);
 
             toast.success(`${files.length} file${files.length === 1 ? "" : "s"} uploaded.`);
             setFiles([]);
-            onUploaded();
+            onUploaded(items);
             onClose();
         } catch (err) {
             toast.error(err instanceof Error ? err.message : "Upload failed");

@@ -1,7 +1,7 @@
 import type { Payload } from "payload";
 import type { HeroCarouselRepository } from "@/lib/repositories/heroCarouselRepository";
 import { mapGalleryDoc, type GalleryDoc } from "@/lib/infrastructure/payload/galleryRepository";
-import type { GalleryMediaItem } from "@/lib/types";
+import type { GalleryMediaItem, GallerySection } from "@/lib/types";
 
 interface HeroCarouselDoc {
     id: string | number;
@@ -21,7 +21,7 @@ export class PayloadHeroCarouselRepository implements HeroCarouselRepository {
         return (docs as HeroCarouselDoc[]).map((doc) => String(doc.media));
     }
 
-    async listSelectedMedia(): Promise<GalleryMediaItem[]> {
+    async listSelectedMedia(section: GallerySection): Promise<GalleryMediaItem[]> {
         const payload = await this.payloadPromise;
         const { docs } = await payload.find({
             collection: "hero-carousel",
@@ -31,7 +31,8 @@ export class PayloadHeroCarouselRepository implements HeroCarouselRepository {
         });
         return (docs as HeroCarouselDoc[])
             .filter((doc): doc is HeroCarouselDoc & { media: GalleryDoc } => typeof doc.media === "object")
-            .map((doc) => mapGalleryDoc(doc.media));
+            .map((doc) => mapGalleryDoc(doc.media))
+            .filter((item) => item.section === section);
     }
 
     async select(mediaId: string): Promise<void> {

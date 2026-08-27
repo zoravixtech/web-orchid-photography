@@ -13,12 +13,7 @@ export default async function AdminHomePage() {
                 </p>
             </header>
 
-            <SettingsForm
-                logoUrl={settings.logoUrl ?? ""}
-                heroVideoUrl={settings.heroVideoUrl ?? ""}
-                stats={settings.stats}
-                socialLinks={settings.socialLinks}
-            />
+            <SettingsForm initialSettings={settings} />
         </div>
     );
 }

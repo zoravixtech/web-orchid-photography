@@ -16,7 +16,7 @@ export default async function Home() {
     const [settings, galleryImages, heroImages, blogPosts] = await Promise.all([
         getSiteSettings(),
         getGalleryMedia("gallery"),
-        getHeroCarouselMedia(),
+        getHeroCarouselMedia("gallery"),
         getBlogs(),
     ]);
 

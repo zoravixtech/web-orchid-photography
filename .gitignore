@@ -42,6 +42,11 @@ next-env.d.ts
 
 /media
 
+# ffmpeg.wasm core — copied from node_modules/@ffmpeg/core at install/build
+# time by scripts/copy-ffmpeg-core.mjs (see lib/videoCompression.ts), not
+# meant to be committed (it's a ~31MB binary blob).
+/public/ffmpeg
+
 # Playwright
 node_modules/
 /test-results/

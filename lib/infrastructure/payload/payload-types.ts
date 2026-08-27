@@ -385,6 +385,7 @@ export interface SiteSetting {
   id: number;
   logoUrl?: string | null;
   heroVideoUrl?: string | null;
+  kidsHeroVideoUrl?: string | null;
   stats: {
     weddings: number;
     preWeddings: number;
@@ -408,6 +409,7 @@ export interface SiteSetting {
 export interface SiteSettingsSelect<T extends boolean = true> {
   logoUrl?: T;
   heroVideoUrl?: T;
+  kidsHeroVideoUrl?: T;
   stats?:
     | T
     | {

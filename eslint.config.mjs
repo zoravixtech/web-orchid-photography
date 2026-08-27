@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Vendored ffmpeg.wasm core, copied verbatim from @ffmpeg/core — not
+    // authored here, shouldn't be linted (see lib/videoCompression.ts).
+    "public/ffmpeg/**",
   ]),
 ]);
 

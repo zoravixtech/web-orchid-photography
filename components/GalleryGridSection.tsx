@@ -17,15 +17,23 @@ function DynamicGalleryCard({ item }: { item: GalleryMediaItem }) {
 
     return (
         <div
-            className="relative w-full overflow-hidden group bg-zinc-100 rounded-none transition-all"
+            className="relative w-full overflow-hidden group bg-slate-100 rounded-none transition-all"
             style={{
                 aspectRatio: aspectRatio ? `${aspectRatio}` : "4 / 3",
             }}
         >
+            {/* Animated skeleton shimmer before image loads */}
+            {!isLoaded && (
+                <div className="absolute inset-0 bg-slate-200 animate-pulse z-0" />
+            )}
+
             <Image
                 src={item.url}
                 alt={item.alt || "Gallery Image"}
                 fill
+                unoptimized
+                loading="lazy"
+                decoding="async"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 onLoad={(e) => {
                     const img = e.currentTarget;
@@ -34,8 +42,9 @@ function DynamicGalleryCard({ item }: { item: GalleryMediaItem }) {
                     }
                     setIsLoaded(true);
                 }}
-                className={`object-cover object-center rounded-none transition-all duration-700 group-hover:scale-105 ${isLoaded ? "opacity-100" : "opacity-0"
-                    }`}
+                className={`object-cover object-center rounded-none transition-opacity duration-500 group-hover:scale-105 ${
+                    isLoaded ? "opacity-100" : "opacity-0"
+                }`}
             />
         </div>
     );
