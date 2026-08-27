@@ -7,7 +7,7 @@ export default function AboutStorySection() {
         <section className="py-16 sm:py-24 bg-white text-slate-800 relative overflow-hidden">
             <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-                    
+
                     {/* LEFT COLUMN: Featured Team / Studio Group Photo */}
                     <div className="lg:col-span-6 relative group">
                         <div className="relative aspect-4/3 w-full rounded-3xl overflow-hidden shadow-2xl border border-purple-100/80">
@@ -21,7 +21,7 @@ export default function AboutStorySection() {
                             {/* Ambient gradient overlay */}
                             <div className="absolute inset-0 bg-linear-to-t from-slate-950/40 via-transparent to-transparent pointer-events-none" />
                         </div>
-                        
+
                         {/* Decorative background accent blob */}
                         <div className="absolute -bottom-6 -right-6 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl -z-10 pointer-events-none" />
                     </div>
