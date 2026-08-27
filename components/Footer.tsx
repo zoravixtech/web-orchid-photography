@@ -2,73 +2,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import type { SocialLinks } from '@/lib/types'
 
-function GDPRBadge() {
-  return (
-    <svg viewBox="0 0 100 100" className="w-13 h-13 sm:w-14 sm:h-14 shrink-0">
-      <circle cx="50" cy="50" r="46" fill="#1E3A8A" stroke="#3B82F6" strokeWidth="2.5" />
-      <circle
-        cx="50"
-        cy="50"
-        r="40"
-        fill="none"
-        stroke="#FACC15"
-        strokeWidth="1.5"
-        strokeDasharray="3 3"
-      />
-      {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((angle, i) => {
-        const rad = (angle * Math.PI) / 180
-        const x = 50 + 33 * Math.cos(rad)
-        const y = 50 + 33 * Math.sin(rad)
-        return <circle key={i} cx={x} cy={y} r="2.2" fill="#FACC15" />
-      })}
-      <text
-        x="50"
-        y="54"
-        textAnchor="middle"
-        fill="#FFFFFF"
-        fontSize="12"
-        fontWeight="bold"
-        fontFamily="sans-serif"
-        letterSpacing="0.5"
-      >
-        ★ GDPR ★
-      </text>
-    </svg>
-  )
-}
-
-function ISOBadge() {
-  return (
-    <svg viewBox="0 0 100 100" className="w-13 h-13 sm:w-14 sm:h-14 shrink-0">
-      <circle cx="50" cy="50" r="46" fill="#0284C7" stroke="#38BDF8" strokeWidth="2.5" />
-      <path
-        d="M 22 28 A 34 34 0 0 1 78 28"
-        fill="none"
-        stroke="#E0F2FE"
-        strokeWidth="1.5"
-        strokeDasharray="2.5 2.5"
-      />
-      <text
-        x="50"
-        y="24"
-        textAnchor="middle"
-        fill="#E0F2FE"
-        fontSize="6"
-        fontWeight="bold"
-        letterSpacing="0.8"
-      >
-        LEAD AUDITOR
-      </text>
-      <text x="50" y="51" textAnchor="middle" fill="#FFFFFF" fontSize="11" fontWeight="bold">
-        ★ ISO ★
-      </text>
-      <text x="50" y="66" textAnchor="middle" fill="#FACC15" fontSize="9" fontWeight="bold">
-        27001
-      </text>
-    </svg>
-  )
-}
-
 export default function Footer({
   logoUrl,
   socialLinks,
@@ -105,12 +38,6 @@ export default function Footer({
               Orchid Photography is fully committed to capturing timeless memories with artistic
               perfection and quality, ensuring full client satisfaction and data privacy.
             </p>
-
-            {/* Badges */}
-            <div className="flex items-center gap-4 mb-6">
-              <GDPRBadge />
-              <ISOBadge />
-            </div>
 
             {/* Copyright */}
             <p className="text-slate-500 text-xs font-medium">
@@ -150,7 +77,7 @@ export default function Footer({
                 </Link>
               </li>
               <li>
-                <Link href="/#about" className="hover:text-purple-400 transition-colors">
+                <Link href="/about" className="hover:text-purple-400 transition-colors">
                   About Us
                 </Link>
               </li>
@@ -172,32 +99,12 @@ export default function Footer({
             </ul>
           </div>
 
-          {/* Column 3: GENERAL */}
+          {/* Column 3: LEGAL & POLICIES */}
           <div>
             <h4 className="text-slate-200 font-bold text-xs sm:text-sm tracking-widest uppercase mb-5 font-sans">
-              GENERAL
+              LEGAL & POLICIES
             </h4>
             <ul className="flex flex-col gap-2.5 text-xs sm:text-sm text-slate-400">
-              <li>
-                <Link href="/#services" className="hover:text-purple-400 transition-colors">
-                  Pre-Wedding Photography
-                </Link>
-              </li>
-              <li>
-                <Link href="/#services" className="hover:text-purple-400 transition-colors">
-                  Wedding Photography
-                </Link>
-              </li>
-              <li>
-                <Link href="/#services" className="hover:text-purple-400 transition-colors">
-                  Baby Photoshoots
-                </Link>
-              </li>
-              <li>
-                <Link href="/#services" className="hover:text-purple-400 transition-colors">
-                  Corporate & Interior
-                </Link>
-              </li>
               <li>
                 <Link href="/privacy-policy" className="hover:text-purple-400 transition-colors">
                   Privacy Policy
@@ -304,11 +211,8 @@ export default function Footer({
               <span>orchidphotography.official@gmail.com</span>
             </a>
 
-            {/* Support Phones */}
+            {/* Support Phone */}
             <div className="mt-2">
-              <span className="text-[10px] font-bold tracking-widest text-slate-400 uppercase block mb-1">
-                SUPPORT
-              </span>
               <a
                 href="tel:+919876543210"
                 className="flex items-center gap-2.5 text-slate-300 hover:text-purple-400 transition-colors"
@@ -328,53 +232,6 @@ export default function Footer({
                 </svg>
                 <span>+91 98765 43210</span>
               </a>
-            </div>
-
-            {/* Sales Phones */}
-            <div className="mt-2">
-              <span className="text-[10px] font-bold tracking-widest text-slate-400 uppercase block mb-1">
-                SALES
-              </span>
-              <div className="flex flex-col gap-1.5">
-                <a
-                  href="tel:+919876543211"
-                  className="flex items-center gap-2.5 text-slate-300 hover:text-purple-400 transition-colors"
-                >
-                  <svg
-                    className="w-4 h-4 text-slate-400 shrink-0"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                    />
-                  </svg>
-                  <span>+91 98765 43211</span>
-                </a>
-                <a
-                  href="tel:+919876543212"
-                  className="flex items-center gap-2.5 text-slate-300 hover:text-purple-400 transition-colors"
-                >
-                  <svg
-                    className="w-4 h-4 text-slate-400 shrink-0"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                    />
-                  </svg>
-                  <span>+91 98765 43212</span>
-                </a>
-              </div>
             </div>
 
             {/* Location Address */}

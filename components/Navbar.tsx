@@ -45,9 +45,9 @@ const leftNavItems: NavItem[] = [
 ];
 
 const rightNavItems: NavItem[] = [
-    { id: "about", label: "About Us", href: "/#about" },
+    { id: "about", label: "About Us", href: "/about" },
     { id: "contact", label: "Contact", href: "/#contact" },
-    { id: "carrer", label: "Carrer", href: "/#about" },
+    { id: "carrer", label: "Career", href: "/about" },
     { id: "blog", label: "Blog", href: "/blog" },
 ];
 

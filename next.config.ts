@@ -5,6 +5,10 @@ const remotePatterns: NonNullable<NextConfig["images"]>["remotePatterns"] = [
     protocol: "https",
     hostname: "images.unsplash.com",
   },
+  {
+    protocol: "https",
+    hostname: "images.prismic.io",
+  },
   // Cloudflare R2's public "r2.dev" dev URLs (https://pub-<hash>.r2.dev/...).
   {
     protocol: "https",

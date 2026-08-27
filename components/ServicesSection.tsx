@@ -54,7 +54,7 @@ export default function ServicesSection({
     description = "Award Winning Best Wedding Photographer in Kolkata, operating all over India",
 }: ServicesSectionProps) {
     return (
-        <section id="services" className="bg-white py-24 px-6">
+        <section id="services" className="bg-white py-20 px-6">
             <div className="max-w-7xl mx-auto">
                 {/* Standardized Section Header */}
                 <SectionHeader subtitle={subtitle} title={title} description={description} />

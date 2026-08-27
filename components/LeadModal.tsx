@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 
 const LOCAL_STORAGE_KEY = "orchid_lead_submitted";
-const INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+const INTERVAL_MS = 10 * 1000; // 10 seconds
 
 export default function LeadModal() {
     const [isOpen, setIsOpen] = useState(false);
@@ -30,7 +30,7 @@ export default function LeadModal() {
 
     const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Helper to start recurring 5-minute timer
+    // Helper to start recurring 10-second timer
     const startRecurringTimer = () => {
         if (timerRef.current) clearInterval(timerRef.current);
         timerRef.current = setInterval(() => {
@@ -50,13 +50,13 @@ export default function LeadModal() {
             return;
         }
 
-        // Initial popup on page load
+        // Initial popup on page load after 10 seconds
         const initialTimer = setTimeout(() => {
             const currentCheck = localStorage.getItem(LOCAL_STORAGE_KEY) === "true";
             if (!currentCheck) {
                 setIsOpen(true);
             }
-        }, 1200);
+        }, 10000);
 
         startRecurringTimer();
 
@@ -156,24 +156,12 @@ export default function LeadModal() {
                         </button>
 
                         {/* LEFT COLUMN: Cover Image with 0 Padding */}
-                        <div className="hidden md:block md:col-span-5 relative bg-slate-900 min-h-[460px]">
+                        <div className="hidden md:block md:col-span-5 relative bg-slate-900 min-h-115">
                             <img
-                                src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=1000&auto=format&fit=crop"
-                                alt="Orchid Photography Wedding"
+                                src="/login_cover.jpg"
+                                alt="Orchid Photography Cover"
                                 className="absolute inset-0 w-full h-full object-cover"
                             />
-                            {/* Dark Gradient Overlay for text readability */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent flex flex-col justify-end p-6 text-white">
-                                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-600/70 backdrop-blur-md text-[11px] font-semibold text-purple-100 tracking-wider uppercase mb-2.5 w-max border border-purple-400/30">
-                                    ✨ Premium Photography
-                                </div>
-                                <h3 className="font-serif text-xl font-bold leading-tight">
-                                    Capture Every Precious Ritual
-                                </h3>
-                                <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
-                                    Get personalized wedding quotes and exclusive packages tailored to your special date.
-                                </p>
-                            </div>
                         </div>
 
                         {/* RIGHT COLUMN: Form Content */}
@@ -285,7 +273,7 @@ export default function LeadModal() {
                                         {/* Step 1 Submit Button */}
                                         <button
                                             type="submit"
-                                            className="w-full mt-3 py-3 px-6 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 active:scale-[0.99] transition-all shadow-md shadow-purple-500/20 flex items-center justify-center gap-2"
+                                            className="w-full mt-3 py-3 px-6 rounded-xl font-semibold text-sm text-white bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 active:scale-[0.99] transition-all shadow-md shadow-purple-500/20 flex items-center justify-center gap-2"
                                         >
                                             <span>Next Step: Contact Info</span>
                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -362,7 +350,7 @@ export default function LeadModal() {
                                             <button
                                                 type="submit"
                                                 disabled={isSubmitting}
-                                                className="grow py-3 px-5 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 active:scale-[0.99] transition-all shadow-md shadow-purple-500/20 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                                                className="grow py-3 px-5 rounded-xl font-semibold text-sm text-white bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 active:scale-[0.99] transition-all shadow-md shadow-purple-500/20 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                                             >
                                                 {isSubmitting ? (
                                                     <span>Submitting...</span>
@@ -382,7 +370,7 @@ export default function LeadModal() {
 
             {/* Toast Notification Banner */}
             {toast.show && (
-                <div className="fixed bottom-6 right-6 z-[100] max-w-md w-full bg-slate-900 text-white rounded-2xl shadow-2xl p-4 border border-purple-500/30 flex items-start gap-3.5 animate-bounce-short">
+                <div className="fixed bottom-6 right-6 z-100 max-w-md w-full bg-slate-900 text-white rounded-2xl shadow-2xl p-4 border border-purple-500/30 flex items-start gap-3.5 animate-bounce-short">
                     <div className="p-2 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/40 shrink-0 mt-0.5">
                         <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />

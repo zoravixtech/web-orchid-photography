@@ -47,16 +47,16 @@ export default function HeroSlider({ images }: HeroSliderProps) {
             {/* Soft dreamy vignette/mist overlay */}
             <div className="absolute inset-0 bg-linear-to-b from-black/20 via-transparent to-white/40 z-20 pointer-events-none" />
 
-            {/* Moving Cloud Layer + Centered Tagline at Bottom */}
-            <div className="absolute bottom-0 left-0 w-full overflow-hidden z-30 pointer-events-none h-48 sm:h-64 md:h-80 flex flex-col justify-end items-center pb-6">
+            {/* Moving Cloud Layer (Shifted down so only top mild wispy traces overlap the hero photo) */}
+            <div className="absolute -bottom-48 left-0 right-0 w-full overflow-hidden z-30 pointer-events-none h-72 sm:h-96 md:h-105 flex flex-col justify-end items-center">
                 {/* Moving Cloud Image */}
-                <div className="absolute inset-0 flex w-[200%] h-full animate-cloud-left-to-right opacity-95">
+                <div className="absolute inset-0 flex w-[200%] animate-cloud-left-to-right opacity-85 h-full">
                     <div className="relative w-1/2 h-full shrink-0">
                         <Image
                             src="/cloud.avif"
                             alt="Cloud Layer"
                             fill
-                            className="object-cover object-bottom"
+                            className="object-cover object-top"
                         />
                     </div>
                     <div className="relative w-1/2 h-full shrink-0">
@@ -64,13 +64,13 @@ export default function HeroSlider({ images }: HeroSliderProps) {
                             src="/cloud.avif"
                             alt="Cloud Layer Duplicate"
                             fill
-                            className="object-cover object-bottom"
+                            className="object-cover object-top"
                         />
                     </div>
                 </div>
 
-                {/* Soft gradient fade at bottom */}
-                <div className="absolute bottom-0 left-0 right-0 h-24 bg-linear-to-t from-white via-white/80 to-transparent pointer-events-none" />
+                {/* Soft gradient fade at bottom into next section */}
+                <div className="absolute bottom-0 left-0 right-0 h-28 bg-linear-to-t from-white via-white/80 to-transparent pointer-events-none" />
             </div>
         </section>
     );
