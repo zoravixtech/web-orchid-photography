@@ -1,7 +1,8 @@
 /**
  * Runs `fn` over `items` with at most `limit` in flight at once, preserving
- * result order. Capping concurrency keeps peak network and memory usage bounded
- * regardless of batch size when uploading multiple files.
+ * result order. Native client-side image compression (`createImageBitmap` and canvas)
+ * allocates memory buffers. Capping concurrency keeps peak memory and network usage
+ * strictly bounded (e.g. 1-3 files at a time) regardless of batch size.
  */
 export async function mapWithConcurrencyLimit<T, R>(
     items: T[],

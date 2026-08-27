@@ -190,8 +190,9 @@ export default function BlogForm({
                 disabled={uploading}
                 className="inline-flex items-center gap-2 rounded-lg bg-slate-900 text-white text-sm px-4 py-2 hover:bg-slate-800 disabled:opacity-60 transition-colors"
               >
-                {uploading ? 'Uploading…' : 'Upload image'}
+                {uploading ? 'Uploading & optimizing…' : 'Upload image'}
               </button>
+              <span className="text-xs text-slate-400">PNG, JPG, WebP or GIF — optimized automatically on upload</span>
             </div>
           </div>
         </div>

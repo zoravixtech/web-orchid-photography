@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import SectionHeader from "@/components/SectionHeader";
 import type { GalleryMediaItem } from "@/lib/types";
@@ -12,39 +11,16 @@ interface GalleryGridSectionProps {
 }
 
 function DynamicGalleryCard({ item }: { item: GalleryMediaItem }) {
-    const [aspectRatio, setAspectRatio] = useState<number | undefined>(undefined);
-    const [isLoaded, setIsLoaded] = useState(false);
-
     return (
-        <div
-            className="relative w-full overflow-hidden group bg-slate-100 rounded-none transition-all"
-            style={{
-                aspectRatio: aspectRatio ? `${aspectRatio}` : "4 / 3",
-            }}
-        >
-            {/* Animated skeleton shimmer before image loads */}
-            {!isLoaded && (
-                <div className="absolute inset-0 bg-slate-200 animate-pulse z-0" />
-            )}
-
+        <div className="relative w-full overflow-hidden group bg-slate-100 rounded-none aspect-4/3">
             <Image
                 src={item.url}
                 alt={item.alt || "Gallery Image"}
                 fill
-                unoptimized
                 loading="lazy"
                 decoding="async"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                onLoad={(e) => {
-                    const img = e.currentTarget;
-                    if (img.naturalWidth && img.naturalHeight) {
-                        setAspectRatio(img.naturalWidth / img.naturalHeight);
-                    }
-                    setIsLoaded(true);
-                }}
-                className={`object-cover object-center rounded-none transition-opacity duration-500 group-hover:scale-105 ${
-                    isLoaded ? "opacity-100" : "opacity-0"
-                }`}
+                className="object-cover object-center rounded-none transition-transform duration-500 group-hover:scale-105"
             />
         </div>
     );

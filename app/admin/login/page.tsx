@@ -12,7 +12,7 @@ export default async function AdminLoginPage() {
             <div className="w-full max-w-md">
                 <div className="bg-slate-900 rounded-2xl border border-slate-800 p-8 shadow-2xl">
                     <div className="text-center mb-8">
-                        <span className="font-serif text-2xl font-bold text-white">
+                        <span className="text-2xl font-bold text-white">
                             Orchid<span className="text-purple-400">.</span>
                         </span>
                         <h1 className="mt-3 text-sm uppercase tracking-widest text-slate-400">

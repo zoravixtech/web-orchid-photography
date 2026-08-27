@@ -1,6 +1,13 @@
+import { Montserrat } from "next/font/google";
+
 export const metadata = {
     title: "Admin | Orchid Photography",
 };
+
+const montserrat = Montserrat({
+    subsets: ["latin"],
+    display: "swap",
+});
 
 export default function AdminRootLayout({
     children,
@@ -8,7 +15,7 @@ export default function AdminRootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div className="min-h-screen bg-zinc-100 text-zinc-900">
+        <div className={`min-h-screen bg-zinc-100 text-zinc-900 ${montserrat.className}`}>
             {children}
         </div>
     );

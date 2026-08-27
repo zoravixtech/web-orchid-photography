@@ -107,7 +107,7 @@ export default function UploadModal({ open, section, onClose, onUploaded }: Uplo
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                         </svg>
                         <span className="text-sm font-medium">Click to select one or more images</span>
-                        <span className="text-xs">PNG, JPG, WebP, AVIF or GIF</span>
+                        <span className="text-xs">PNG, JPG, WebP, AVIF or GIF — optimized automatically on upload</span>
                     </button>
 
                     {files.length > 0 && (
@@ -135,7 +135,7 @@ export default function UploadModal({ open, section, onClose, onUploaded }: Uplo
                     {uploading && (
                         <div>
                             <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-                                <span>Uploading…</span>
+                                <span>Uploading &amp; optimizing…</span>
                                 <span>{Math.round(progress * 100)}%</span>
                             </div>
                             <div className="h-2 bg-slate-100 rounded-full overflow-hidden">

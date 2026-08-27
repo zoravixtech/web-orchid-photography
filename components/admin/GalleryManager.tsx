@@ -82,7 +82,7 @@ export default function GalleryManager({ section, initialImages, initialHeroCaro
   return (
     <div className="w-full">
       <header className="mb-6">
-        <h1 className="text-2xl font-serif font-bold text-slate-900">
+        <h1 className="text-2xl font-bold text-slate-900">
           {section === 'gallery' ? 'Wedding Gallery' : 'Kids Gallery'}
         </h1>
         <p className="text-sm text-slate-500 mt-1">
@@ -161,7 +161,6 @@ export default function GalleryManager({ section, initialImages, initialHeroCaro
                 src={item.url}
                 alt={item.alt || 'Gallery image'}
                 fill
-                unoptimized
                 loading="lazy"
                 decoding="async"
                 sizes="(max-width: 768px) 50vw, 25vw"

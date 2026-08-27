@@ -141,7 +141,7 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Sit
                                 disabled={uploadingKind === "logo"}
                                 className="inline-flex items-center gap-2 rounded-lg bg-slate-900 text-white text-sm px-4 py-2 hover:bg-slate-800 disabled:opacity-60 transition-colors"
                             >
-                                {uploadingKind === "logo" ? "Uploading…" : "Upload new logo"}
+                                {uploadingKind === "logo" ? "Uploading & optimizing…" : "Upload new logo"}
                             </button>
                             <span className="text-xs text-slate-400">PNG, JPG, WebP or SVG</span>
                         </div>
@@ -200,7 +200,7 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Sit
                             disabled={uploadingKind === "video"}
                             className="inline-flex items-center gap-2 rounded-lg bg-slate-900 text-white text-sm px-4 py-2 hover:bg-slate-800 disabled:opacity-60 transition-colors"
                         >
-                            {uploadingKind === "video" ? "Uploading…" : "Upload new video"}
+                            {uploadingKind === "video" ? "Uploading & optimizing…" : "Upload new video"}
                         </button>
                         <span className="text-xs text-slate-400">MP4, WebM or MOV — optimized automatically on upload</span>
                     </div>
@@ -258,7 +258,7 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Sit
                             disabled={uploadingKind === "kidsVideo"}
                             className="inline-flex items-center gap-2 rounded-lg bg-slate-900 text-white text-sm px-4 py-2 hover:bg-slate-800 disabled:opacity-60 transition-colors"
                         >
-                            {uploadingKind === "kidsVideo" ? "Uploading…" : "Upload new video"}
+                            {uploadingKind === "kidsVideo" ? "Uploading & optimizing…" : "Upload new video"}
                         </button>
                         <span className="text-xs text-slate-400">MP4, WebM or MOV — optimized automatically on upload</span>
                     </div>

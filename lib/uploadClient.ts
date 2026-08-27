@@ -1,4 +1,5 @@
 import { createUploadUrl, finalizeUpload } from "@/app/admin/actions/upload";
+import { compressImageFile } from "@/lib/imageCompression";
 import { compressVideoFile } from "@/lib/videoCompression";
 import { isVideoKind, type UploadKind } from "@/lib/uploadKinds";
 import type { GalleryMediaItem } from "@/lib/types";
@@ -32,9 +33,9 @@ function putFile(
 }
 
 /**
- * Transcodes video files in the browser if applicable (see lib/videoCompression.ts),
- * then uploads the file directly to R2 via a presigned URL, and persists any related metadata
- * (gallery-media row, or a site-settings field).
+ * Compresses/transcodes the file entirely in the browser (see lib/imageCompression.ts
+ * and lib/videoCompression.ts), then uploads the file directly to R2 via a presigned URL,
+ * and persists any related metadata (gallery-media row, or a site-settings field).
  */
 export async function uploadFile(
     kind: UploadKind,
@@ -42,13 +43,12 @@ export async function uploadFile(
     alt: string,
     onProgress?: (fraction: number) => void
 ): Promise<UploadResult> {
-    const isVideo = isVideoKind(kind);
-    const reportCompress = isVideo && onProgress ? (fraction: number) => onProgress(fraction * 0.4) : undefined;
-    const reportUpload = onProgress
-        ? (fraction: number) => (isVideo ? onProgress(0.4 + fraction * 0.6) : onProgress(fraction))
-        : undefined;
+    const reportCompress = onProgress ? (fraction: number) => onProgress(fraction * 0.4) : undefined;
+    const reportUpload = onProgress ? (fraction: number) => onProgress(0.4 + fraction * 0.6) : undefined;
 
-    const optimized = isVideo ? await compressVideoFile(file, reportCompress) : file;
+    const optimized = isVideoKind(kind)
+        ? await compressVideoFile(file, reportCompress)
+        : await compressImageFile(file, kind === "logo" ? "logo" : "photo");
 
     const presign = await createUploadUrl({
         kind,

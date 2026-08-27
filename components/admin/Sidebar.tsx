@@ -50,7 +50,7 @@ export default function Sidebar() {
     return (
         <aside className="fixed inset-y-0 left-0 z-40 w-64 flex flex-col bg-slate-900 text-slate-300">
             <div className="flex items-center gap-2 px-6 h-16 border-b border-slate-800">
-                <span className="font-serif font-bold text-lg text-white whitespace-nowrap">
+                <span className="font-bold text-lg text-white whitespace-nowrap">
                     Orchid<span className="text-purple-400">.</span>
                 </span>
                 <span className="text-[10px] uppercase tracking-widest text-slate-400 mt-1">
