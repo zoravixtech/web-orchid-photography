@@ -4,3 +4,5 @@ allowBuilds:
   sharp: false
   unrs-resolver: false
   esbuild: true
+
+minimumReleaseAge: 0
