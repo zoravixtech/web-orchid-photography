@@ -4,11 +4,12 @@ import { revalidatePath, updateTag } from "next/cache";
 import { getBlogRepository } from "@/lib/infrastructure";
 import { requireAdmin } from "@/lib/auth/session";
 import { BLOGS_TAG } from "@/lib/data/blogs";
-import type { BlogBlock } from "@/lib/types";
+import type { BlogBlock, BlogPost } from "@/lib/types";
 
 export interface BlogActionResult {
     error?: string;
     success?: boolean;
+    post?: BlogPost;
 }
 
 function slugify(input: string): string {
@@ -91,7 +92,7 @@ export async function createBlog(
         return { error: "A blog with this slug already exists. Choose a different slug." };
     }
 
-    await repo.create({
+    const post = await repo.create({
         slug,
         title: fields.title,
         date: fields.date,
@@ -101,7 +102,7 @@ export async function createBlog(
     });
 
     revalidateBlogRoutes();
-    return { success: true };
+    return { success: true, post };
 }
 
 export async function updateBlog(
@@ -125,7 +126,7 @@ export async function updateBlog(
         return { error: "A blog with this slug already exists. Choose a different slug." };
     }
 
-    await repo.update(id, {
+    const post = await repo.update(id, {
         slug,
         title: fields.title,
         date: fields.date,
@@ -135,7 +136,7 @@ export async function updateBlog(
     });
 
     revalidateBlogRoutes();
-    return { success: true };
+    return { success: true, post };
 }
 
 export async function deleteBlog(id: string): Promise<BlogActionResult> {

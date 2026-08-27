@@ -1,9 +1,33 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { getAudienceFromHostname, getKidographyDomain, getWeddingDomain, type Audience } from "@/lib/config/domain";
+
+// window.location never changes without a full navigation, so there's
+// nothing to subscribe to — this is purely a server/client-safe read.
+const noopSubscribe = () => () => {};
+
+function getClientAudience(): Audience {
+    return getAudienceFromHostname(window.location.hostname);
+}
+
+function getServerAudience(): Audience {
+    return "wedding";
+}
+
+function getClientSwitchHref(): string {
+    const detected = getClientAudience();
+    const targetHost = detected === "wedding" ? getKidographyDomain() : getWeddingDomain();
+    const port = window.location.port ? `:${window.location.port}` : "";
+    return `${window.location.protocol}//${targetHost}${port}/`;
+}
+
+function getServerSwitchHref(): string {
+    return `https://${getKidographyDomain()}/`;
+}
 
 interface NavItem {
     id: string;
@@ -11,9 +35,11 @@ interface NavItem {
     href: string;
 }
 
+// "home"/"gallery"/"services" are same-site anchors; the audience switch
+// (2nd item) links across to the sibling domain and is computed per-render
+// below since it depends on which domain the page was loaded from.
 const leftNavItems: NavItem[] = [
     { id: "home", label: "Home", href: "/" },
-    { id: "kidography", label: "Kidography", href: "/kidography" },
     { id: "gallery", label: "Gallery", href: "/#gallery" },
     { id: "services", label: "Services", href: "/#services" },
 ];
@@ -29,6 +55,19 @@ export default function Navbar({ logoUrl }: { logoUrl?: string | null }) {
     const [isScrolled, setIsScrolled] = useState(false);
     const [activeSection, setActiveSection] = useState<string | null>(null);
     const pathname = usePathname();
+
+    // Audience is unknown at SSR time (no request context in a client
+    // component) — useSyncExternalStore renders the "wedding" server
+    // snapshot on the client's first (hydration) pass so markup matches,
+    // then re-renders with the real hostname-derived value right after.
+    const audience = useSyncExternalStore(noopSubscribe, getClientAudience, getServerAudience);
+    const switchHref = useSyncExternalStore(noopSubscribe, getClientSwitchHref, getServerSwitchHref);
+
+    const switchNavItem: NavItem = {
+        id: "switch",
+        label: audience === "wedding" ? "Kidography" : "Wedding",
+        href: switchHref,
+    };
 
     useEffect(() => {
         const handleScroll = () => {
@@ -96,9 +135,8 @@ export default function Navbar({ logoUrl }: { logoUrl?: string | null }) {
     const renderNavLink = (item: NavItem) => {
         const isActive =
             (item.id === "home" && pathname === "/" && (activeSection === null || activeSection === "home")) ||
-            (item.id === "kidography" && pathname === "/kidography") ||
             (item.id === "blog" && pathname.startsWith("/blog")) ||
-            (item.id !== "carrer" && pathname === "/" && activeSection === item.id);
+            (item.id !== "carrer" && item.id !== "switch" && pathname === "/" && activeSection === item.id);
 
         return (
             <Link
@@ -139,7 +177,9 @@ export default function Navbar({ logoUrl }: { logoUrl?: string | null }) {
                 <nav className="flex items-center gap-6 sm:gap-8 md:gap-10">
                     {/* Left Nav Items */}
                     <div className="flex items-center gap-4 sm:gap-6 md:gap-8">
-                        {leftNavItems.map(renderNavLink)}
+                        {renderNavLink(leftNavItems[0])}
+                        {renderNavLink(switchNavItem)}
+                        {leftNavItems.slice(1).map(renderNavLink)}
                     </div>
 
                     {/* Website Logo Centered */}

@@ -5,6 +5,7 @@ export const SiteSettings: GlobalConfig = {
     fields: [
         { name: "logoUrl", type: "text", defaultValue: "/favicon.webp" },
         { name: "heroVideoUrl", type: "text" },
+        { name: "kidsHeroVideoUrl", type: "text" },
         {
             name: "stats",
             type: "group",

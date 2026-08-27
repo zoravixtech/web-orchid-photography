@@ -9,6 +9,7 @@ import { normalizeMediaUrl } from "@/lib/utils/mediaUrl";
 interface SiteSettingsDoc {
     logoUrl: string | null;
     heroVideoUrl: string | null;
+    kidsHeroVideoUrl: string | null;
     stats: SiteSettings["stats"];
     socialLinks: SiteSettings["socialLinks"];
 }
@@ -25,6 +26,7 @@ export class PayloadSettingsRepository implements SettingsRepository {
         return {
             logoUrl: doc.logoUrl ? normalizeMediaUrl(doc.logoUrl) : null,
             heroVideoUrl: doc.heroVideoUrl ? normalizeMediaUrl(doc.heroVideoUrl) : null,
+            kidsHeroVideoUrl: doc.kidsHeroVideoUrl ? normalizeMediaUrl(doc.kidsHeroVideoUrl) : null,
             stats: doc.stats,
             socialLinks: doc.socialLinks,
         };
@@ -34,6 +36,7 @@ export class PayloadSettingsRepository implements SettingsRepository {
         const patch: Record<string, unknown> = {};
         if (data.logoUrl !== undefined) patch.logoUrl = data.logoUrl;
         if (data.heroVideoUrl !== undefined) patch.heroVideoUrl = data.heroVideoUrl;
+        if (data.kidsHeroVideoUrl !== undefined) patch.kidsHeroVideoUrl = data.kidsHeroVideoUrl;
         if (data.stats !== undefined) patch.stats = data.stats;
         if (data.socialLinks !== undefined) patch.socialLinks = data.socialLinks;
 

@@ -44,6 +44,7 @@ export interface SocialLinks {
 export interface SiteSettings {
     logoUrl: string | null;
     heroVideoUrl: string | null;
+    kidsHeroVideoUrl: string | null;
     stats: StatsCounters;
     socialLinks: SocialLinks;
 }

@@ -3,6 +3,7 @@ import type { SiteSettings, SocialLinks } from "@/lib/types";
 export interface UpdateSiteSettingsInput {
     logoUrl?: string | null;
     heroVideoUrl?: string | null;
+    kidsHeroVideoUrl?: string | null;
     stats?: SiteSettings["stats"];
     socialLinks?: SocialLinks;
 }

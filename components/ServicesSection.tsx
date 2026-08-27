@@ -2,13 +2,13 @@ import Image from "next/image";
 import SectionHeader from "@/components/SectionHeader";
 import type { GalleryMediaItem } from "@/lib/types";
 
-interface ServiceItem {
+export interface ServiceItem {
     id: string;
     title: string;
     category: string;
 }
 
-const servicesData: ServiceItem[] = [
+export const weddingServicesData: ServiceItem[] = [
     { id: "bengali-wedding", title: "Bengali Wedding Photography", category: "KOLKATA / BENGALI WEDDING" },
     { id: "pre-wedding", title: "Pre Wedding Photography", category: "SIKKIM / DESTINATION PREWEDDING" },
     { id: "maternity-baby", title: "Maternity & Baby Photography", category: "KOLKATA / BABY & MATERNITY" },
@@ -23,20 +23,45 @@ const servicesData: ServiceItem[] = [
     { id: "corporate", title: "Kolkata Corporate Photography", category: "KOLKATA / CORPORATE" },
 ];
 
-export default function ServicesSection({ images }: { images: GalleryMediaItem[] }) {
+export const kidsServicesData: ServiceItem[] = [
+    { id: "newborn", title: "Newborn Photography", category: "KOLKATA / NEWBORN SHOOT" },
+    { id: "cake-smash", title: "Cake Smash Photography", category: "KOLKATA / CAKE SMASH" },
+    { id: "birthday", title: "Kids Birthday Photography", category: "KOLKATA / BIRTHDAY CELEBRATION" },
+    { id: "toddler", title: "Toddler Photography", category: "KOLKATA / TODDLER PORTRAITS" },
+    { id: "annaprasan", title: "Annaprasan Ceremony Photography", category: "KOLKATA / RICE CEREMONY" },
+    { id: "family-kids", title: "Family & Kids Photography", category: "KOLKATA / FAMILY WITH KIDS" },
+    { id: "sibling", title: "Sibling Photography", category: "KOLKATA / SIBLING PORTRAITS" },
+    { id: "kids-fashion", title: "Kids Fashion Photography", category: "SILIGURI / KIDS FASHION" },
+    { id: "school-event", title: "School Event Photography", category: "KOLKATA / SCHOOL EVENTS" },
+    { id: "maternity-journey", title: "Maternity To Baby Journey", category: "BHUBANESWAR / MATERNITY & BABY" },
+    { id: "candid-kids", title: "Candid Kids Photography", category: "PATNA / CANDID KIDS" },
+    { id: "kids-portrait", title: "Kids Portrait Photography", category: "KOLKATA / KIDS PORTRAIT" },
+];
+
+interface ServicesSectionProps {
+    images: GalleryMediaItem[];
+    services?: ServiceItem[];
+    subtitle?: string;
+    title?: string;
+    description?: string;
+}
+
+export default function ServicesSection({
+    images,
+    services = weddingServicesData,
+    subtitle = "Our Specializations",
+    title = "Orchid Photography",
+    description = "Award Winning Best Wedding Photographer in Kolkata, operating all over India",
+}: ServicesSectionProps) {
     return (
         <section id="services" className="bg-white py-24 px-6">
             <div className="max-w-7xl mx-auto">
                 {/* Standardized Section Header */}
-                <SectionHeader
-                    subtitle="Our Specializations"
-                    title="Orchid Photography"
-                    description="Award Winning Best Wedding Photographer in Kolkata, operating all over India"
-                />
+                <SectionHeader subtitle={subtitle} title={title} description={description} />
 
                 {/* 3-Column Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-12">
-                    {servicesData.map((item, index) => {
+                    {services.map((item, index) => {
                         const image = images.length > 0 ? images[index % images.length] : null;
                         return (
                             <div key={item.id} className="group cursor-pointer">

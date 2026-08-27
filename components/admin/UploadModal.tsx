@@ -1,17 +1,16 @@
 "use client";
 
 import { useRef, useState } from "react";
-import type { GallerySection } from "@/lib/types";
-import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL, formatBytes } from "@/lib/uploadLimits";
-import { uploadFileDirect } from "@/lib/uploadClient";
-import { finalizeUpload } from "@/app/admin/actions/upload";
+import type { GallerySection, GalleryMediaItem } from "@/lib/types";
+import { uploadFile } from "@/lib/uploadClient";
+import { mapWithConcurrencyLimit } from "@/lib/concurrency";
 import { useToast } from "@/components/admin/Toast";
 
 interface UploadModalProps {
     open: boolean;
     section: GallerySection;
     onClose: () => void;
-    onUploaded: () => void;
+    onUploaded: (items: GalleryMediaItem[]) => void;
 }
 
 export default function UploadModal({ open, section, onClose, onUploaded }: UploadModalProps) {
@@ -25,17 +24,7 @@ export default function UploadModal({ open, section, onClose, onUploaded }: Uplo
 
     const addFiles = (list: FileList | null) => {
         if (!list) return;
-        const incoming = Array.from(list);
-        const tooLarge = incoming.filter((file) => file.size > MAX_UPLOAD_BYTES);
-        const accepted = incoming.filter((file) => file.size <= MAX_UPLOAD_BYTES);
-
-        tooLarge.forEach((file) => {
-            toast.error(`"${file.name}" is ${formatBytes(file.size)}, which is over the ${MAX_UPLOAD_LABEL} limit.`);
-        });
-
-        if (accepted.length > 0) {
-            setFiles((prev) => [...prev, ...accepted]);
-        }
+        setFiles((prev) => [...prev, ...Array.from(list)]);
     };
 
     const handleUpload = async () => {
@@ -50,22 +39,23 @@ export default function UploadModal({ open, section, onClose, onUploaded }: Uplo
         };
 
         try {
-            const uploaded = await Promise.all(
-                files.map(async (file, index) => {
-                    const { key, publicUrl } = await uploadFileDirect(section, file, (fraction) => {
-                        perFileProgress[index] = fraction;
-                        updateProgress();
-                    });
-                    return { key, publicUrl, alt: file.name || "" };
+            // Bounded concurrency prevents overwhelming browser network connections
+            // during large batch uploads (see lib/concurrency.ts). Each result already
+            // comes back as a full GalleryMediaItem row, persisted server-side.
+            const uploaded = await mapWithConcurrencyLimit(files, 3, (file, index) =>
+                uploadFile(section, file, file.name || "", (fraction) => {
+                    perFileProgress[index] = fraction;
+                    updateProgress();
                 })
             );
 
-            const result = await finalizeUpload(section, uploaded);
-            if (result.error) throw new Error(result.error);
+            const items = uploaded
+                .map((result) => result.galleryItem)
+                .filter((item): item is GalleryMediaItem => item !== undefined);
 
             toast.success(`${files.length} file${files.length === 1 ? "" : "s"} uploaded.`);
             setFiles([]);
-            onUploaded();
+            onUploaded(items);
             onClose();
         } catch (err) {
             toast.error(err instanceof Error ? err.message : "Upload failed");
@@ -117,7 +107,7 @@ export default function UploadModal({ open, section, onClose, onUploaded }: Uplo
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                         </svg>
                         <span className="text-sm font-medium">Click to select one or more images</span>
-                        <span className="text-xs">PNG, JPG, WebP, AVIF or GIF</span>
+                        <span className="text-xs">PNG, JPG, WebP, AVIF or GIF — optimized automatically on upload</span>
                     </button>
 
                     {files.length > 0 && (
@@ -145,7 +135,7 @@ export default function UploadModal({ open, section, onClose, onUploaded }: Uplo
                     {uploading && (
                         <div>
                             <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-                                <span>Uploading…</span>
+                                <span>Uploading &amp; optimizing…</span>
                                 <span>{Math.round(progress * 100)}%</span>
                             </div>
                             <div className="h-2 bg-slate-100 rounded-full overflow-hidden">

@@ -1,21 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { updateSettings } from "@/app/admin/actions/settings";
-import { finalizeUpload } from "@/app/admin/actions/upload";
-import { uploadFileDirect } from "@/lib/uploadClient";
-import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL, formatBytes } from "@/lib/uploadLimits";
+import { uploadFile } from "@/lib/uploadClient";
 import { useToast } from "@/components/admin/Toast";
-import type { SocialLinks, StatsCounters } from "@/lib/types";
-
-interface SettingsFormProps {
-    logoUrl: string;
-    heroVideoUrl: string;
-    stats: StatsCounters;
-    socialLinks: SocialLinks;
-}
+import { useAdminSettingsStore } from "@/stores/adminSettingsStore";
+import type { SiteSettings, SocialLinks, StatsCounters } from "@/lib/types";
 
 const STAT_FIELDS: { key: keyof StatsCounters; label: string }[] = [
     { key: "weddings", label: "Weddings" },
@@ -32,33 +22,35 @@ const SOCIAL_FIELDS: { key: keyof SocialLinks; label: string; placeholder: strin
     { key: "linkedin", label: "LinkedIn", placeholder: "https://linkedin.com/company/yourcompany" },
 ];
 
-async function uploadFile(kind: "logo" | "video", file: File): Promise<string> {
-    const { key, publicUrl } = await uploadFileDirect(kind, file);
-    const result = await finalizeUpload(kind, [{ key, publicUrl, alt: file.name || "" }]);
-    if (result.error) throw new Error(result.error);
-    return publicUrl;
-}
-
-export default function SettingsForm({ logoUrl, heroVideoUrl, stats, socialLinks }: SettingsFormProps) {
-    const router = useRouter();
+export default function SettingsForm({ initialSettings }: { initialSettings: SiteSettings }) {
     const toast = useToast();
-    const [logo, setLogo] = useState(logoUrl);
-    const [video, setVideo] = useState(heroVideoUrl);
-    const [uploadingKind, setUploadingKind] = useState<"logo" | "video" | null>(null);
+
+    // Reads the live store — on a revisit within this session this is
+    // already populated, so the form paints instantly with the last-known
+    // values instead of a blank flash while the fresh props below settle in.
+    const settings = useAdminSettingsStore((state) => state.settings);
+    const hydrate = useAdminSettingsStore((state) => state.hydrate);
+    const setField = useAdminSettingsStore((state) => state.setField);
+    const save = useAdminSettingsStore((state) => state.save);
+
+    useEffect(() => {
+        hydrate(initialSettings);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [initialSettings]);
+
+    const [uploadingKind, setUploadingKind] = useState<"logo" | "video" | "kidsVideo" | null>(null);
     const [saving, setSaving] = useState(false);
     const logoInputRef = useRef<HTMLInputElement>(null);
     const videoInputRef = useRef<HTMLInputElement>(null);
+    const kidsVideoInputRef = useRef<HTMLInputElement>(null);
 
-    const handleUpload = async (kind: "logo" | "video", file: File) => {
-        if (kind === "logo" && file.size > MAX_UPLOAD_BYTES) {
-            toast.error(`"${file.name}" is ${formatBytes(file.size)}, which is over the ${MAX_UPLOAD_LABEL} limit.`);
-            return;
-        }
+    const handleUpload = async (kind: "logo" | "video" | "kidsVideo", file: File) => {
         setUploadingKind(kind);
         try {
-            const url = await uploadFile(kind, file);
-            if (kind === "logo") setLogo(url);
-            else setVideo(url);
+            const { publicUrl } = await uploadFile(kind, file, file.name || "");
+            if (kind === "logo") setField("logoUrl", publicUrl);
+            else if (kind === "video") setField("heroVideoUrl", publicUrl);
+            else setField("kidsHeroVideoUrl", publicUrl);
             toast.success(kind === "logo" ? "Logo uploaded." : "Video uploaded.");
         } catch (err) {
             toast.error(err instanceof Error ? err.message : "Upload failed");
@@ -67,23 +59,33 @@ export default function SettingsForm({ logoUrl, heroVideoUrl, stats, socialLinks
         }
     };
 
-    const handleSave = async (formData: FormData) => {
+    const setStat = (key: keyof StatsCounters, raw: string) => {
+        const value = Number(raw);
+        setField("stats", { ...settings.stats, [key]: Number.isFinite(value) && value >= 0 ? Math.round(value) : 0 });
+    };
+
+    const setSocial = (key: keyof SocialLinks, value: string) => {
+        setField("socialLinks", { ...settings.socialLinks, [key]: value || null });
+    };
+
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault();
         setSaving(true);
         try {
-            const result = await updateSettings(formData);
-            if (result.error) {
-                toast.error(result.error);
-            } else {
-                toast.success("Settings saved.");
-                router.refresh();
-            }
+            const result = await save({
+                logoUrl: settings.logoUrl || null,
+                stats: settings.stats,
+                socialLinks: settings.socialLinks,
+            });
+            if (result.error) toast.error(result.error);
+            else toast.success("Settings saved.");
         } finally {
             setSaving(false);
         }
     };
 
     return (
-        <form action={handleSave} className="space-y-6">
+        <form onSubmit={handleSave} className="space-y-6">
             {/* Logo */}
             <section className="bg-white rounded-xl border border-slate-200 p-6">
                 <h2 className="text-lg font-semibold text-slate-900">Logo</h2>
@@ -93,9 +95,9 @@ export default function SettingsForm({ logoUrl, heroVideoUrl, stats, socialLinks
 
                 <div className="flex items-start gap-6">
                     <div className="w-28 h-28 shrink-0 rounded-xl border border-dashed border-slate-300 bg-slate-50 flex items-center justify-center overflow-hidden">
-                        {logo ? (
+                        {settings.logoUrl ? (
                             <Image
-                                src={logo}
+                                src={settings.logoUrl}
                                 alt="Site logo preview"
                                 width={112}
                                 height={112}
@@ -113,10 +115,9 @@ export default function SettingsForm({ logoUrl, heroVideoUrl, stats, socialLinks
                             </label>
                             <input
                                 id="logo_url"
-                                name="logo_url"
                                 type="text"
-                                value={logo}
-                                onChange={(e) => setLogo(e.target.value)}
+                                value={settings.logoUrl ?? ""}
+                                onChange={(e) => setField("logoUrl", e.target.value)}
                                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 placeholder="/favicon.webp"
                             />
@@ -140,7 +141,7 @@ export default function SettingsForm({ logoUrl, heroVideoUrl, stats, socialLinks
                                 disabled={uploadingKind === "logo"}
                                 className="inline-flex items-center gap-2 rounded-lg bg-slate-900 text-white text-sm px-4 py-2 hover:bg-slate-800 disabled:opacity-60 transition-colors"
                             >
-                                {uploadingKind === "logo" ? "Uploading…" : "Upload new logo"}
+                                {uploadingKind === "logo" ? "Uploading & optimizing…" : "Upload new logo"}
                             </button>
                             <span className="text-xs text-slate-400">PNG, JPG, WebP or SVG</span>
                         </div>
@@ -162,20 +163,19 @@ export default function SettingsForm({ logoUrl, heroVideoUrl, stats, socialLinks
                         </label>
                         <input
                             id="hero_video_url"
-                            name="hero_video_url"
                             type="text"
-                            value={video}
-                            onChange={(e) => setVideo(e.target.value)}
+                            value={settings.heroVideoUrl ?? ""}
                             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                             placeholder="https://... or upload a video below"
                             disabled
+                            readOnly
                         />
                     </div>
 
-                    {video && (
+                    {settings.heroVideoUrl && (
                         <video
-                            key={video}
-                            src={video}
+                            key={settings.heroVideoUrl}
+                            src={settings.heroVideoUrl}
                             controls
                             playsInline
                             className="w-full aspect-video rounded-xl bg-black object-cover"
@@ -200,9 +200,67 @@ export default function SettingsForm({ logoUrl, heroVideoUrl, stats, socialLinks
                             disabled={uploadingKind === "video"}
                             className="inline-flex items-center gap-2 rounded-lg bg-slate-900 text-white text-sm px-4 py-2 hover:bg-slate-800 disabled:opacity-60 transition-colors"
                         >
-                            {uploadingKind === "video" ? "Uploading…" : "Upload new video"}
+                            {uploadingKind === "video" ? "Uploading & optimizing…" : "Upload new video"}
                         </button>
-                        <span className="text-xs text-slate-400">MP4, WebM or MOV</span>
+                        <span className="text-xs text-slate-400">MP4, WebM or MOV — optimized automatically on upload</span>
+                    </div>
+                </div>
+            </section>
+
+            {/* Kidography hero video */}
+            <section className="bg-white rounded-xl border border-slate-200 p-6">
+                <h2 className="text-lg font-semibold text-slate-900">Kidography Landing Page Video</h2>
+                <p className="text-sm text-slate-500 mt-1 mb-5">
+                    The autoplay video shown in the featured section on the kidography home page.
+                </p>
+
+                <div className="space-y-3">
+                    <div>
+                        <label htmlFor="kids_hero_video_url" className="block text-xs font-medium text-slate-500 mb-1">
+                            Video URL
+                        </label>
+                        <input
+                            id="kids_hero_video_url"
+                            type="text"
+                            value={settings.kidsHeroVideoUrl ?? ""}
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="https://... or upload a video below"
+                            disabled
+                            readOnly
+                        />
+                    </div>
+
+                    {settings.kidsHeroVideoUrl && (
+                        <video
+                            key={settings.kidsHeroVideoUrl}
+                            src={settings.kidsHeroVideoUrl}
+                            controls
+                            playsInline
+                            className="w-full aspect-video rounded-xl bg-black object-cover"
+                        />
+                    )}
+
+                    <div className="flex items-center gap-3">
+                        <input
+                            ref={kidsVideoInputRef}
+                            type="file"
+                            accept="video/mp4,video/webm,video/quicktime"
+                            className="hidden"
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleUpload("kidsVideo", file);
+                                e.target.value = "";
+                            }}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => kidsVideoInputRef.current?.click()}
+                            disabled={uploadingKind === "kidsVideo"}
+                            className="inline-flex items-center gap-2 rounded-lg bg-slate-900 text-white text-sm px-4 py-2 hover:bg-slate-800 disabled:opacity-60 transition-colors"
+                        >
+                            {uploadingKind === "kidsVideo" ? "Uploading & optimizing…" : "Upload new video"}
+                        </button>
+                        <span className="text-xs text-slate-400">MP4, WebM or MOV — optimized automatically on upload</span>
                     </div>
                 </div>
             </section>
@@ -222,11 +280,11 @@ export default function SettingsForm({ logoUrl, heroVideoUrl, stats, socialLinks
                             </label>
                             <input
                                 id={key}
-                                name={key}
                                 type="number"
                                 min={0}
                                 step={1}
-                                defaultValue={stats[key]}
+                                value={settings.stats[key]}
+                                onChange={(e) => setStat(key, e.target.value)}
                                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                             />
                         </div>
@@ -249,9 +307,9 @@ export default function SettingsForm({ logoUrl, heroVideoUrl, stats, socialLinks
                             </label>
                             <input
                                 id={`social_${key}`}
-                                name={`social_${key}`}
                                 type="url"
-                                defaultValue={socialLinks[key] ?? ""}
+                                value={settings.socialLinks[key] ?? ""}
+                                onChange={(e) => setSocial(key, e.target.value)}
                                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 placeholder={placeholder}
                             />

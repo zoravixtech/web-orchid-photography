@@ -3,53 +3,36 @@
 import { revalidatePath, updateTag } from "next/cache";
 import { getSettingsRepository } from "@/lib/infrastructure";
 import { requireAdmin } from "@/lib/auth/session";
-import type { SocialLinks } from "@/lib/types";
+import { SETTINGS_TAG } from "@/lib/data/settings";
+import type { SocialLinks, StatsCounters } from "@/lib/types";
 
 export interface SettingsActionResult {
     error?: string;
     success?: boolean;
 }
 
-const STAT_FIELDS = ["weddings", "preWeddings", "babyPhotoshoots", "corporateInterior"] as const;
-
-function readStatValue(formData: FormData, field: string): number {
-    const raw = Number(formData.get(field) ?? 0);
-    if (!Number.isFinite(raw) || raw < 0) return 0;
-    return Math.round(raw);
+export interface UpdateSettingsInput {
+    logoUrl: string | null;
+    stats: StatsCounters;
+    socialLinks: SocialLinks;
 }
 
-function readSocialValue(formData: FormData, field: string): string | null {
-    const raw = String(formData.get(field) ?? "").trim();
-    return raw || null;
-}
-
-export async function updateSettings(formData: FormData): Promise<SettingsActionResult> {
+export async function updateSettings(input: UpdateSettingsInput): Promise<SettingsActionResult> {
     await requireAdmin();
-
-    const logoUrl = String(formData.get("logo_url") ?? "").trim();
-    const heroVideoUrl = String(formData.get("hero_video_url") ?? "").trim();
-    const stats = Object.fromEntries(
-        STAT_FIELDS.map((field) => [field, readStatValue(formData, field)])
-    ) as Record<(typeof STAT_FIELDS)[number], number>;
-    const socialLinks: SocialLinks = {
-        whatsapp: readSocialValue(formData, "social_whatsapp"),
-        facebook: readSocialValue(formData, "social_facebook"),
-        instagram: readSocialValue(formData, "social_instagram"),
-        youtube: readSocialValue(formData, "social_youtube"),
-        linkedin: readSocialValue(formData, "social_linkedin"),
-    };
 
     const repo = getSettingsRepository();
     if (!repo) return { error: "Database is not configured." };
 
     await repo.update({
-        logoUrl: logoUrl || null,
-        heroVideoUrl: heroVideoUrl || null,
-        stats,
-        socialLinks,
+        logoUrl: input.logoUrl,
+        // Hero video URLs are read-only here (persisted immediately via the
+        // dedicated upload flow in /api/admin/upload) — omitted so this save
+        // doesn't clobber them.
+        stats: input.stats,
+        socialLinks: input.socialLinks,
     });
 
-    updateTag("settings");
+    updateTag(SETTINGS_TAG);
     revalidatePath("/", "layout");
 
     return { success: true };

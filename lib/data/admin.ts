@@ -1,5 +1,5 @@
 import { getBlogRepository, getGalleryRepository, getHeroCarouselRepository } from "@/lib/infrastructure";
-import type { BlogPost, GalleryMediaItem } from "@/lib/types";
+import type { BlogPost, GalleryMediaItem, GallerySection } from "@/lib/types";
 
 // Uncached, fresh reads used by the admin panel (which always renders dynamically).
 
@@ -9,21 +9,19 @@ export async function listGalleryMedia(): Promise<GalleryMediaItem[]> {
     return repo.list();
 }
 
-export async function getGalleryForAdmin(): Promise<{
-    gallery: GalleryMediaItem[];
-    kids: GalleryMediaItem[];
+// Wedding gallery and kids gallery are managed on separate admin pages
+// (/admin/gallery and /admin/gallery/kids); each fetches just its own section.
+export async function getGalleryForAdmin(section: GallerySection): Promise<{
+    images: GalleryMediaItem[];
     heroCarouselIds: string[];
 }> {
+    const repo = getGalleryRepository();
     const heroRepo = getHeroCarouselRepository();
-    const [all, heroCarouselIds] = await Promise.all([
-        listGalleryMedia(),
+    const [images, heroCarouselIds] = await Promise.all([
+        repo ? repo.list(section) : Promise.resolve([]),
         heroRepo ? heroRepo.listSelectedIds() : Promise.resolve([]),
     ]);
-    return {
-        gallery: all.filter((item) => item.section === "gallery"),
-        kids: all.filter((item) => item.section === "kids"),
-        heroCarouselIds,
-    };
+    return { images, heroCarouselIds };
 }
 
 export async function listBlogsForAdmin(): Promise<BlogPost[]> {

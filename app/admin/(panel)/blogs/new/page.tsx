@@ -12,7 +12,7 @@ export default function NewBlogPage() {
                     </Link>{" "}
                     / <span className="text-slate-500">New Blog</span>
                 </div>
-                <h1 className="text-2xl font-serif font-bold text-slate-900">Create a New Blog</h1>
+                <h1 className="text-2xl font-bold text-slate-900">Create a New Blog</h1>
                 <p className="text-sm text-slate-500 mt-1">
                     Write the post content, add a cover image, then publish.
                 </p>

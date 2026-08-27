@@ -1,11 +1,21 @@
-import { createUploadUrl, type UploadKind } from "@/app/admin/actions/upload";
+import { createUploadUrl, finalizeUpload } from "@/app/admin/actions/upload";
+import { compressImageFile } from "@/lib/imageCompression";
+import { compressVideoFile } from "@/lib/videoCompression";
+import { isVideoKind, type UploadKind } from "@/lib/uploadKinds";
+import type { GalleryMediaItem } from "@/lib/types";
 
-export interface DirectUploadResult {
-    key: string;
+export interface UploadResult {
     publicUrl: string;
+    /** Present only for kind "gallery"/"kids" — the created DB row. */
+    galleryItem?: GalleryMediaItem;
 }
 
-function putFile(url: string, file: File, contentType: string, onProgress?: (fraction: number) => void): Promise<void> {
+function putFile(
+    url: string,
+    file: File,
+    contentType: string,
+    onProgress?: (fraction: number) => void
+): Promise<void> {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open("PUT", url);
@@ -23,26 +33,38 @@ function putFile(url: string, file: File, contentType: string, onProgress?: (fra
 }
 
 /**
- * Uploads a file straight to R2/S3 via a presigned URL, bypassing this
- * server entirely so large files (video) don't hit Vercel's request body
- * limit. Callers still need to persist metadata via finalizeUpload
- * afterwards for kinds that get stored in the DB (gallery/kids/logo/video).
+ * Compresses/transcodes the file entirely in the browser (see lib/imageCompression.ts
+ * and lib/videoCompression.ts), then uploads the file directly to R2 via a presigned URL,
+ * and persists any related metadata (gallery-media row, or a site-settings field).
  */
-export async function uploadFileDirect(
+export async function uploadFile(
     kind: UploadKind,
     file: File,
+    alt: string,
     onProgress?: (fraction: number) => void
-): Promise<DirectUploadResult> {
-    const contentType = file.type;
-    const result = await createUploadUrl({
+): Promise<UploadResult> {
+    const reportCompress = onProgress ? (fraction: number) => onProgress(fraction * 0.4) : undefined;
+    const reportUpload = onProgress ? (fraction: number) => onProgress(0.4 + fraction * 0.6) : undefined;
+
+    const optimized = isVideoKind(kind)
+        ? await compressVideoFile(file, reportCompress)
+        : await compressImageFile(file, kind === "logo" ? "logo" : "photo");
+
+    const presign = await createUploadUrl({
         kind,
-        fileName: file.name,
-        contentType,
-        size: file.size,
+        fileName: optimized.name,
+        contentType: optimized.type,
+        size: optimized.size,
     });
-    if ("error" in result) throw new Error(result.error);
+    if ("error" in presign) throw new Error(presign.error);
 
-    await putFile(result.uploadUrl, file, contentType, onProgress);
+    await putFile(presign.uploadUrl, optimized, optimized.type, reportUpload);
 
-    return { key: result.key, publicUrl: result.publicUrl };
+    const result = await finalizeUpload(kind, [{ key: presign.key, publicUrl: presign.publicUrl, alt }]);
+    if (result.error) throw new Error(result.error);
+
+    const item = result.items?.[0];
+    const galleryItem = item && "section" in item ? item : undefined;
+
+    return { publicUrl: presign.publicUrl, galleryItem };
 }

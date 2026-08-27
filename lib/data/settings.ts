@@ -4,6 +4,7 @@ import type { GalleryMediaItem, GallerySection, SiteSettings } from "@/lib/types
 
 export const GALLERY_TAG = "gallery";
 export const HERO_CAROUSEL_TAG = "hero-carousel";
+export const SETTINGS_TAG = "settings";
 
 const DEFAULT_STATS: SiteSettings["stats"] = {
     weddings: 800,
@@ -23,6 +24,7 @@ const DEFAULT_SOCIAL_LINKS: SiteSettings["socialLinks"] = {
 const DEFAULT_SETTINGS: SiteSettings = {
     logoUrl: "/favicon.webp",
     heroVideoUrl: null,
+    kidsHeroVideoUrl: null,
     stats: DEFAULT_STATS,
     socialLinks: DEFAULT_SOCIAL_LINKS,
 };
@@ -38,12 +40,13 @@ export const getSiteSettings = unstable_cache(
         return {
             logoUrl: settings.logoUrl ?? DEFAULT_SETTINGS.logoUrl,
             heroVideoUrl: settings.heroVideoUrl ?? DEFAULT_SETTINGS.heroVideoUrl,
+            kidsHeroVideoUrl: settings.kidsHeroVideoUrl ?? DEFAULT_SETTINGS.kidsHeroVideoUrl,
             stats: { ...DEFAULT_STATS, ...(settings.stats ?? {}) },
             socialLinks: { ...DEFAULT_SOCIAL_LINKS, ...(settings.socialLinks ?? {}) },
         };
     },
     ["site-settings"],
-    { revalidate: 86400, tags: ["settings"] }
+    { revalidate: 86400, tags: [SETTINGS_TAG] }
 );
 
 export const getGalleryMedia = unstable_cache(
@@ -56,11 +59,13 @@ export const getGalleryMedia = unstable_cache(
     { revalidate: 86400, tags: [GALLERY_TAG] }
 );
 
+// "gallery" -> wedding hero carousel, "kids" -> kidography hero carousel;
+// selected items are filtered by the section of the gallery-media they point at.
 export const getHeroCarouselMedia = unstable_cache(
-    async (): Promise<GalleryMediaItem[]> => {
+    async (section: GallerySection): Promise<GalleryMediaItem[]> => {
         const repo = getHeroCarouselRepository();
         if (!repo) return [];
-        return repo.listSelectedMedia();
+        return repo.listSelectedMedia(section);
     },
     ["hero-carousel-media"],
     { revalidate: 86400, tags: [HERO_CAROUSEL_TAG] }

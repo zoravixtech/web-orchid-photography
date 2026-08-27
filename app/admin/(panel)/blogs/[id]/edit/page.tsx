@@ -22,7 +22,7 @@ export default async function EditBlogPage({
                     </Link>{" "}
                     / <span className="text-slate-500">Edit Blog</span>
                 </div>
-                <h1 className="text-2xl font-serif font-bold text-slate-900">Edit Blog</h1>
+                <h1 className="text-2xl font-bold text-slate-900">Edit Blog</h1>
                 <p className="text-sm text-slate-500 mt-1">Update the blog post and republish.</p>
             </header>
 

@@ -7,9 +7,9 @@ import { useRouter } from 'next/navigation'
 import BlockEditor from '@/components/admin/BlockEditor'
 import type { BlogBlock, BlogPost } from '@/lib/types'
 import type { BlogActionResult } from '@/app/admin/actions/blogs'
-import { uploadFileDirect } from '@/lib/uploadClient'
-import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL, formatBytes } from '@/lib/uploadLimits'
+import { uploadFile } from '@/lib/uploadClient'
 import { useToast } from '@/components/admin/Toast'
+import { useAdminBlogStore } from '@/stores/adminBlogStore'
 
 interface BlogFormProps {
   initialData?: BlogPost
@@ -42,23 +42,22 @@ export default function BlogForm({
   }, [state.error])
 
   useEffect(() => {
-    if (state.success) {
+    if (state.success && state.post) {
+      // Reflect the change in the cached list immediately — no server
+      // refetch needed when the admin navigates back to /admin/blogs.
+      if (initialData) useAdminBlogStore.getState().updatePost(state.post)
+      else useAdminBlogStore.getState().addPost(state.post)
+
       toast.success(initialData ? 'Blog post updated.' : 'Blog post published.')
       router.push(cancelHref)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.success])
+  }, [state.success, state.post])
 
   const handleImageUpload = async (file: File) => {
-    if (file.size > MAX_UPLOAD_BYTES) {
-      toast.error(
-        `"${file.name}" is ${formatBytes(file.size)}, which is over the ${MAX_UPLOAD_LABEL} limit.`,
-      )
-      return
-    }
     setUploading(true)
     try {
-      const { publicUrl } = await uploadFileDirect('blog', file)
+      const { publicUrl } = await uploadFile('blog', file, file.name || '')
       setImage(publicUrl)
       toast.success('Cover image uploaded.')
     } catch (err) {
@@ -191,8 +190,9 @@ export default function BlogForm({
                 disabled={uploading}
                 className="inline-flex items-center gap-2 rounded-lg bg-slate-900 text-white text-sm px-4 py-2 hover:bg-slate-800 disabled:opacity-60 transition-colors"
               >
-                {uploading ? 'Uploading…' : 'Upload image'}
+                {uploading ? 'Uploading & optimizing…' : 'Upload image'}
               </button>
+              <span className="text-xs text-slate-400">PNG, JPG, WebP or GIF — optimized automatically on upload</span>
             </div>
           </div>
         </div>
