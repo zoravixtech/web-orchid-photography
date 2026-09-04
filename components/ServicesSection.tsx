@@ -50,7 +50,7 @@ export default function ServicesSection({
     images,
     services = weddingServicesData,
     subtitle = "Our Specializations",
-    title = "Orchid Photography",
+    title = "The Orchid Photography",
     description = "Award Winning Best Wedding Photographer in Kolkata, operating all over India",
 }: ServicesSectionProps) {
     return (

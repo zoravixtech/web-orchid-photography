@@ -1,4 +1,4 @@
-import { createUploadUrl, finalizeUpload } from "@/app/admin/actions/upload";
+import { createUploadUrl, finalizeUpload, type FinalizeUploadContext } from "@/app/admin/actions/upload";
 import { compressImageFile } from "@/lib/imageCompression";
 import { compressVideoFile } from "@/lib/videoCompression";
 import { isVideoKind, type UploadKind } from "@/lib/uploadKinds";
@@ -6,7 +6,9 @@ import type { GalleryMediaItem } from "@/lib/types";
 
 export interface UploadResult {
     publicUrl: string;
-    /** Present only for kind "gallery"/"kids" — the created DB row. */
+    /** The storage key — kept around for kinds without server-side DB persistence (album cover/images). */
+    storagePath: string;
+    /** Present only for kind "media" — the created DB row. */
     galleryItem?: GalleryMediaItem;
 }
 
@@ -35,12 +37,13 @@ function putFile(
 /**
  * Compresses/transcodes the file entirely in the browser (see lib/imageCompression.ts
  * and lib/videoCompression.ts), then uploads the file directly to R2 via a presigned URL,
- * and persists any related metadata (gallery-media row, or a site-settings field).
+ * and persists any related metadata (gallery-media row, or an org's site-settings field).
  */
 export async function uploadFile(
     kind: UploadKind,
     file: File,
     alt: string,
+    context: FinalizeUploadContext = {},
     onProgress?: (fraction: number) => void
 ): Promise<UploadResult> {
     const reportCompress = onProgress ? (fraction: number) => onProgress(fraction * 0.4) : undefined;
@@ -48,7 +51,7 @@ export async function uploadFile(
 
     const optimized = isVideoKind(kind)
         ? await compressVideoFile(file, reportCompress)
-        : await compressImageFile(file, kind === "logo" ? "logo" : "photo");
+        : await compressImageFile(file, "photo");
 
     const presign = await createUploadUrl({
         kind,
@@ -60,11 +63,11 @@ export async function uploadFile(
 
     await putFile(presign.uploadUrl, optimized, optimized.type, reportUpload);
 
-    const result = await finalizeUpload(kind, [{ key: presign.key, publicUrl: presign.publicUrl, alt }]);
+    const result = await finalizeUpload(kind, [{ key: presign.key, publicUrl: presign.publicUrl, alt }], context);
     if (result.error) throw new Error(result.error);
 
     const item = result.items?.[0];
-    const galleryItem = item && "section" in item ? item : undefined;
+    const galleryItem = item && "org" in item ? item : undefined;
 
-    return { publicUrl: presign.publicUrl, galleryItem };
+    return { publicUrl: presign.publicUrl, storagePath: presign.key, galleryItem };
 }

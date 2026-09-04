@@ -1,9 +1,12 @@
 import { sqliteAdapter } from "@payloadcms/db-sqlite";
 import { buildConfig } from "payload";
 import { Blogs } from "./lib/infrastructure/payload/collections/Blogs.ts";
+import { Careers } from "./lib/infrastructure/payload/collections/Careers.ts";
+import { Categories } from "./lib/infrastructure/payload/collections/Categories.ts";
+import { Albums } from "./lib/infrastructure/payload/collections/Albums.ts";
 import { GalleryMedia } from "./lib/infrastructure/payload/collections/GalleryMedia.ts";
 import { HeroCarousel } from "./lib/infrastructure/payload/collections/HeroCarousel.ts";
-import { SiteSettings } from "./lib/infrastructure/payload/globals/SiteSettings.ts";
+import { SiteSettingsOrchid, SiteSettingsKidography, SiteSettingsLegacy } from "./lib/infrastructure/payload/globals/SiteSettings.ts";
 
 /**
  * Payload is used purely as a headless data layer here (Local API only —
@@ -23,8 +26,8 @@ export default buildConfig({
         // rely on dev-mode schema push, not the migration CLI).
         migrationDir: "migrations",
     }),
-    collections: [Blogs, GalleryMedia, HeroCarousel],
-    globals: [SiteSettings],
+    collections: [Blogs, Careers, Categories, Albums, GalleryMedia, HeroCarousel],
+    globals: [SiteSettingsOrchid, SiteSettingsKidography, SiteSettingsLegacy],
     typescript: {
         outputFile: "lib/infrastructure/payload/payload-types.ts",
     },

@@ -6,7 +6,7 @@ import { getSession } from "@/lib/auth/session";
 import { GALLERY_TAG, SETTINGS_TAG } from "@/lib/data/settings";
 import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL, formatBytes } from "@/lib/uploadLimits";
 import { ALLOWED_KINDS, IMAGE_TYPES, VIDEO_TYPES, isVideoKind, type UploadKind } from "@/lib/uploadKinds";
-import type { GalleryMediaItem, GallerySection } from "@/lib/types";
+import type { GalleryMediaItem, Org } from "@/lib/types";
 
 export type { UploadKind };
 
@@ -56,7 +56,7 @@ export async function createUploadUrl(
         return { error: `Unsupported file type for ${input.kind}: ${input.contentType}` };
     }
 
-    // Videos have no app-level size cap; images/logo/blog covers still do.
+    // Videos have no app-level size cap; images still do.
     if (!isVideo && input.size > MAX_UPLOAD_BYTES) {
         return {
             error: `"${input.fileName}" is ${formatBytes(input.size)}, which is over the ${MAX_UPLOAD_LABEL} limit.`,
@@ -80,6 +80,11 @@ export interface FinalizeUploadItem {
     alt: string;
 }
 
+export interface FinalizeUploadContext {
+    org?: Org;
+    categoryId?: string;
+}
+
 export interface FinalizeUploadResult {
     items?: (GalleryMediaItem | { url: string })[];
     error?: string;
@@ -87,24 +92,30 @@ export interface FinalizeUploadResult {
 
 /**
  * Persists metadata for files that have already been uploaded straight to
- * storage (see createUploadUrl). Only gallery/kids/logo/video kinds need a
- * DB write here — a blog cover image is just referenced by URL in the blog
- * form and saved when the post itself is saved.
+ * storage (see createUploadUrl). Only the "media" (gallery-media row) and
+ * "video" (org settings) kinds need a DB write here — album images/covers
+ * and blog covers are just referenced by URL and persisted when the owning
+ * album/blog record itself is saved.
  */
 export async function finalizeUpload(
     kind: UploadKind,
-    items: FinalizeUploadItem[]
+    items: FinalizeUploadItem[],
+    context: FinalizeUploadContext = {}
 ): Promise<FinalizeUploadResult> {
     const session = await getSession();
     if (!session) return { error: "Unauthorized" };
     if (items.length === 0) return { error: "No files provided." };
 
-    if (kind === "gallery" || kind === "kids") {
+    if (kind === "media") {
+        if (!context.org || !context.categoryId) {
+            return { error: "Missing org/category for media upload." };
+        }
         const galleryRepo = getGalleryRepository();
         if (!galleryRepo) return { error: "Database is not configured." };
 
         const rows = items.map((item) => ({
-            section: kind as GallerySection,
+            org: context.org as Org,
+            categoryId: context.categoryId as string,
             url: item.publicUrl,
             alt: item.alt,
             storagePath: item.key,
@@ -114,21 +125,18 @@ export async function finalizeUpload(
         updateTag(GALLERY_TAG);
         revalidatePath("/");
         revalidatePath("/kidography");
+        revalidatePath("/gallery");
+        revalidatePath("/kidography/gallery");
 
         return { items: created };
     }
 
-    if (kind === "logo" || kind === "video" || kind === "kidsVideo") {
+    if (kind === "video") {
+        if (!context.org) return { error: "Missing org for video upload." };
         const settingsRepo = getSettingsRepository();
         if (!settingsRepo) return { error: "Database is not configured." };
 
-        const patch =
-            kind === "logo"
-                ? { logoUrl: items[0].publicUrl }
-                : kind === "video"
-                    ? { heroVideoUrl: items[0].publicUrl }
-                    : { kidsHeroVideoUrl: items[0].publicUrl };
-        await settingsRepo.update(patch);
+        await settingsRepo.update(context.org, { heroVideoUrl: items[0].publicUrl });
         updateTag(SETTINGS_TAG);
         revalidatePath("/");
         revalidatePath("/kidography");

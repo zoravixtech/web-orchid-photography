@@ -1,35 +1,46 @@
 import { create } from "zustand";
-import { deleteGalleryMedia, deleteAllGalleryMedia, toggleHeroCarousel } from "@/app/admin/actions/gallery";
-import type { GalleryMediaItem, GallerySection } from "@/lib/types";
+import {
+    deleteGalleryMedia,
+    deleteAllGalleryMedia,
+    toggleHeroCarousel,
+    togglePinned as togglePinnedAction,
+} from "@/app/admin/actions/gallery";
+import type { GalleryMediaItem, Org } from "@/lib/types";
 
-interface SectionState {
+interface CategoryState {
     images: GalleryMediaItem[];
     heroCarouselIds: Set<string>;
-    /** True once real (server-fetched) data has ever been loaded into this section. */
     hydrated: boolean;
 }
 
 interface AdminGalleryStore {
-    gallery: SectionState;
-    kids: SectionState;
-    /** Seeds/refreshes a section from a fresh server fetch. */
-    hydrate: (section: GallerySection, images: GalleryMediaItem[], heroCarouselIds: string[]) => void;
-    /** Appends newly-uploaded items (already persisted server-side by /api/admin/upload). */
-    addImages: (section: GallerySection, items: GalleryMediaItem[]) => void;
+    byCategory: Record<string, CategoryState>;
+    /** Seeds/refreshes a category tab from a fresh server fetch. */
+    hydrate: (categoryId: string, images: GalleryMediaItem[], heroCarouselIds: string[]) => void;
+    /** Appends newly-uploaded items (already persisted server-side). */
+    addImages: (categoryId: string, items: GalleryMediaItem[]) => void;
     /** Optimistic: removes immediately, rolls back on server error. */
-    deleteImage: (section: GallerySection, id: string) => Promise<{ error?: string }>;
-    /** Deletes all images in a section. */
-    deleteAllImages: (section: GallerySection) => Promise<{ error?: string; deletedCount?: number }>;
+    deleteImage: (categoryId: string, id: string) => Promise<{ error?: string }>;
+    /** Deletes all images in a category. */
+    deleteAllImages: (org: Org, categoryId: string) => Promise<{ error?: string; deletedCount?: number }>;
     /** Optimistic: flips the hero-carousel flag immediately, rolls back on server error. */
-    toggleHero: (section: GallerySection, id: string, selected: boolean) => Promise<{ error?: string }>;
+    toggleHero: (categoryId: string, id: string, selected: boolean) => Promise<{ error?: string }>;
+    /** Optimistic: flips the pinned flag immediately, rolls back on server error. */
+    togglePinned: (categoryId: string, id: string, pinned: boolean) => Promise<{ error?: string }>;
+    /** Applies the same pinned value to every id; reverts only the ones that failed. */
+    bulkTogglePinned: (categoryId: string, ids: string[], pinned: boolean) => Promise<{ error?: string; failedCount?: number }>;
+    /** Applies the same hero-carousel membership to every id; reverts only the ones that failed. */
+    bulkToggleHero: (categoryId: string, ids: string[], selected: boolean) => Promise<{ error?: string; failedCount?: number }>;
+    /** Deletes every id; any that fail are left in place. */
+    bulkDelete: (categoryId: string, ids: string[]) => Promise<{ error?: string; deletedCount?: number; failedCount?: number }>;
 }
 
-function emptySection(): SectionState {
+function emptyCategory(): CategoryState {
     return { images: [], heroCarouselIds: new Set(), hydrated: false };
 }
 
 // Guards against React's "two children with the same key" warning if a
-// section is ever hydrated/appended with an overlapping id — e.g. a
+// category tab is ever hydrated/appended with an overlapping id — e.g. a
 // server refetch landing while an optimistic addImages() from an in-flight
 // upload hasn't settled yet.
 function dedupeById(images: GalleryMediaItem[]): GalleryMediaItem[] {
@@ -43,62 +54,198 @@ function dedupeById(images: GalleryMediaItem[]): GalleryMediaItem[] {
     return result;
 }
 
+function getOrInit(state: AdminGalleryStore, categoryId: string): CategoryState {
+    return state.byCategory[categoryId] ?? emptyCategory();
+}
+
 export const useAdminGalleryStore = create<AdminGalleryStore>((set, get) => ({
-    gallery: emptySection(),
-    kids: emptySection(),
+    byCategory: {},
 
-    hydrate: (section, images, heroCarouselIds) => {
-        set({ [section]: { images: dedupeById(images), heroCarouselIds: new Set(heroCarouselIds), hydrated: true } });
-    },
-
-    addImages: (section, items) => {
-        set((state) => {
-            const existingIds = new Set(state[section].images.map((image) => image.id));
-            const newItems = dedupeById(items).filter((item) => !existingIds.has(item.id));
-            return { [section]: { ...state[section], images: [...newItems, ...state[section].images] } };
-        });
-    },
-
-    deleteImage: async (section, id) => {
-        const previous = get()[section];
-        set({
-            [section]: {
-                ...previous,
-                images: previous.images.filter((image) => image.id !== id),
-                heroCarouselIds: new Set([...previous.heroCarouselIds].filter((heroId) => heroId !== id)),
+    hydrate: (categoryId, images, heroCarouselIds) => {
+        set((state) => ({
+            byCategory: {
+                ...state.byCategory,
+                [categoryId]: { images: dedupeById(images), heroCarouselIds: new Set(heroCarouselIds), hydrated: true },
             },
+        }));
+    },
+
+    addImages: (categoryId, items) => {
+        set((state) => {
+            const previous = getOrInit(state, categoryId);
+            const existingIds = new Set(previous.images.map((image) => image.id));
+            const newItems = dedupeById(items).filter((item) => !existingIds.has(item.id));
+            return {
+                byCategory: {
+                    ...state.byCategory,
+                    [categoryId]: { ...previous, images: [...newItems, ...previous.images] },
+                },
+            };
         });
+    },
+
+    deleteImage: async (categoryId, id) => {
+        const previous = getOrInit(get(), categoryId);
+        set((state) => ({
+            byCategory: {
+                ...state.byCategory,
+                [categoryId]: {
+                    ...previous,
+                    images: previous.images.filter((image) => image.id !== id),
+                    heroCarouselIds: new Set([...previous.heroCarouselIds].filter((heroId) => heroId !== id)),
+                },
+            },
+        }));
 
         const result = await deleteGalleryMedia(id);
-        if (result.error) set({ [section]: previous });
+        if (result.error) set((state) => ({ byCategory: { ...state.byCategory, [categoryId]: previous } }));
         return result;
     },
 
-    deleteAllImages: async (section) => {
-        const previous = get()[section];
-        set({
-            [section]: {
-                ...previous,
-                images: [],
-                heroCarouselIds: new Set(),
+    deleteAllImages: async (org, categoryId) => {
+        const previous = getOrInit(get(), categoryId);
+        set((state) => ({
+            byCategory: {
+                ...state.byCategory,
+                [categoryId]: { ...previous, images: [], heroCarouselIds: new Set() },
             },
-        });
+        }));
 
-        const result = await deleteAllGalleryMedia(section);
-        if (result.error) set({ [section]: previous });
+        const result = await deleteAllGalleryMedia(org, categoryId);
+        if (result.error) set((state) => ({ byCategory: { ...state.byCategory, [categoryId]: previous } }));
         return result;
     },
 
-    toggleHero: async (section, id, selected) => {
-        const previous = get()[section];
+    toggleHero: async (categoryId, id, selected) => {
+        const previous = getOrInit(get(), categoryId);
         const nextHeroIds = new Set(previous.heroCarouselIds);
         if (selected) nextHeroIds.add(id);
         else nextHeroIds.delete(id);
-        set({ [section]: { ...previous, heroCarouselIds: nextHeroIds } });
+        set((state) => ({ byCategory: { ...state.byCategory, [categoryId]: { ...previous, heroCarouselIds: nextHeroIds } } }));
 
         const result = await toggleHeroCarousel(id, selected);
-        if (result.error) set({ [section]: previous });
+        if (result.error) set((state) => ({ byCategory: { ...state.byCategory, [categoryId]: previous } }));
         return result;
     },
-}));
 
+    togglePinned: async (categoryId, id, pinned) => {
+        const previous = getOrInit(get(), categoryId);
+        set((state) => ({
+            byCategory: {
+                ...state.byCategory,
+                [categoryId]: {
+                    ...previous,
+                    images: previous.images.map((image) => (image.id === id ? { ...image, pinned } : image)),
+                },
+            },
+        }));
+
+        const result = await togglePinnedAction(id, pinned);
+        if (result.error) set((state) => ({ byCategory: { ...state.byCategory, [categoryId]: previous } }));
+        return result;
+    },
+
+    bulkTogglePinned: async (categoryId, ids, pinned) => {
+        const previous = getOrInit(get(), categoryId);
+        set((state) => ({
+            byCategory: {
+                ...state.byCategory,
+                [categoryId]: {
+                    ...previous,
+                    images: previous.images.map((image) => (ids.includes(image.id) ? { ...image, pinned } : image)),
+                },
+            },
+        }));
+
+        const results = await Promise.allSettled(ids.map((id) => togglePinnedAction(id, pinned)));
+        const failedIds = ids.filter((id, i) => {
+            const r = results[i];
+            return r.status === "rejected" || (r.status === "fulfilled" && r.value.error);
+        });
+        if (failedIds.length > 0) {
+            set((state) => {
+                const current = getOrInit(state, categoryId);
+                return {
+                    byCategory: {
+                        ...state.byCategory,
+                        [categoryId]: {
+                            ...current,
+                            images: current.images.map((image) => {
+                                if (!failedIds.includes(image.id)) return image;
+                                const original = previous.images.find((p) => p.id === image.id);
+                                return original ?? image;
+                            }),
+                        },
+                    },
+                };
+            });
+        }
+        return failedIds.length > 0 ? { error: "Some images failed to update.", failedCount: failedIds.length } : {};
+    },
+
+    bulkToggleHero: async (categoryId, ids, selected) => {
+        const previous = getOrInit(get(), categoryId);
+        const nextHeroIds = new Set(previous.heroCarouselIds);
+        for (const id of ids) {
+            if (selected) nextHeroIds.add(id);
+            else nextHeroIds.delete(id);
+        }
+        set((state) => ({ byCategory: { ...state.byCategory, [categoryId]: { ...previous, heroCarouselIds: nextHeroIds } } }));
+
+        const results = await Promise.allSettled(ids.map((id) => toggleHeroCarousel(id, selected)));
+        const failedIds = ids.filter((id, i) => {
+            const r = results[i];
+            return r.status === "rejected" || (r.status === "fulfilled" && r.value.error);
+        });
+        if (failedIds.length > 0) {
+            set((state) => {
+                const current = getOrInit(state, categoryId);
+                const revertedHeroIds = new Set(current.heroCarouselIds);
+                for (const id of failedIds) {
+                    if (previous.heroCarouselIds.has(id)) revertedHeroIds.add(id);
+                    else revertedHeroIds.delete(id);
+                }
+                return { byCategory: { ...state.byCategory, [categoryId]: { ...current, heroCarouselIds: revertedHeroIds } } };
+            });
+        }
+        return failedIds.length > 0 ? { error: "Some images failed to update.", failedCount: failedIds.length } : {};
+    },
+
+    bulkDelete: async (categoryId, ids) => {
+        const previous = getOrInit(get(), categoryId);
+        const idSet = new Set(ids);
+        set((state) => ({
+            byCategory: {
+                ...state.byCategory,
+                [categoryId]: {
+                    ...previous,
+                    images: previous.images.filter((image) => !idSet.has(image.id)),
+                    heroCarouselIds: new Set([...previous.heroCarouselIds].filter((heroId) => !idSet.has(heroId))),
+                },
+            },
+        }));
+
+        const results = await Promise.allSettled(ids.map((id) => deleteGalleryMedia(id)));
+        const failedIds = ids.filter((id, i) => {
+            const r = results[i];
+            return r.status === "rejected" || (r.status === "fulfilled" && r.value.error);
+        });
+        if (failedIds.length > 0) {
+            // Restore just the images that failed to delete.
+            set((state) => {
+                const current = getOrInit(state, categoryId);
+                const restored = previous.images.filter((image) => failedIds.includes(image.id));
+                return {
+                    byCategory: {
+                        ...state.byCategory,
+                        [categoryId]: { ...current, images: dedupeById([...current.images, ...restored]) },
+                    },
+                };
+            });
+        }
+        return {
+            deletedCount: ids.length - failedIds.length,
+            ...(failedIds.length > 0 ? { error: "Some images failed to delete.", failedCount: failedIds.length } : {}),
+        };
+    },
+}));

@@ -1,14 +1,24 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import type { Audience } from '@/lib/config/domain'
 import type { SocialLinks } from '@/lib/types'
 
+// Hardcoded per-org logo assets (task: logo is no longer admin-editable).
+// Both files already bake in the full wordmark, so they replace the
+// icon+text combo that used to sit here rather than sitting alongside it.
+const ORCHID_LOGO = '/orchid-logo.png'
+const KIDOGRAPHY_LOGO = '/kidography-logo.png'
+
 export default function Footer({
-  logoUrl,
+  org,
   socialLinks,
 }: {
-  logoUrl?: string | null
+  org: Audience
   socialLinks: SocialLinks
 }) {
+  const logoSrc = org === 'kidography' ? KIDOGRAPHY_LOGO : ORCHID_LOGO
+  const logoAlt = org === 'kidography' ? 'The Orchid Kidography Logo' : 'The Orchid Photography Logo'
+
   return (
     <footer
       id="contact"
@@ -20,28 +30,25 @@ export default function Footer({
           <div className="flex flex-col items-start">
             {/* Logo */}
             <div className="mb-4">
-              <Link href="/" className="flex items-center gap-2.5 group">
+              <Link href="/" className="flex items-center group">
                 <Image
-                  src={logoUrl || '/favicon.webp'}
-                  alt="Orchid Photography Logo"
-                  width={40}
-                  height={40}
-                  className="h-10 w-auto object-contain transition-transform group-hover:scale-105"
+                  src={logoSrc}
+                  alt={logoAlt}
+                  width={100}
+                  height={org === 'kidography' ? 100 : 141}
+                  className="h-16 w-auto object-contain transition-transform group-hover:scale-105"
                 />
-                <span className="font-serif text-xl font-bold tracking-tight text-white">
-                  Orchid <span className="text-purple-400 font-normal">Photography</span>
-                </span>
               </Link>
             </div>
 
             <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-6 max-w-sm">
-              Orchid Photography is fully committed to capturing timeless memories with artistic
+              The Orchid Photography is fully committed to capturing timeless memories with artistic
               perfection and quality, ensuring full client satisfaction and data privacy.
             </p>
 
             {/* Copyright */}
             <p className="text-slate-500 text-xs font-medium">
-              © Orchid Photography - All rights reserved.
+              © The Orchid Photography - All rights reserved.
             </p>
           </div>
 
@@ -57,7 +64,7 @@ export default function Footer({
                 </Link>
               </li>
               <li>
-                <Link href="/#services" className="hover:text-purple-400 transition-colors">
+                <Link href="/services" className="hover:text-purple-400 transition-colors">
                   Services
                 </Link>
               </li>
@@ -79,6 +86,11 @@ export default function Footer({
               <li>
                 <Link href="/about" className="hover:text-purple-400 transition-colors">
                   About Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/career" className="hover:text-purple-400 transition-colors">
+                  Career
                 </Link>
               </li>
               <li>

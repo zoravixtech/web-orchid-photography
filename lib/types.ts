@@ -1,11 +1,43 @@
-export type GallerySection = "gallery" | "kids";
+import type { Audience } from "@/lib/config/domain";
+
+// The two independent content organizations managed from the admin panel's
+// team switcher. Deliberately the same union as Audience (domain.ts) — an
+// org's public site is reached at the matching audience's domain — but kept
+// as a separate alias since "Org" is the DB/admin-facing vocabulary while
+// "Audience" is the hostname-detection vocabulary.
+export type Org = Audience;
 
 export interface GalleryMediaItem {
     id: string;
-    section: GallerySection;
+    org: Org;
+    categoryId: string;
     url: string;
     alt: string;
     storagePath: string | null;
+    pinned: boolean;
+    createdAt: string;
+}
+
+export interface Category {
+    id: string;
+    org: Org;
+    name: string;
+}
+
+export interface AlbumImage {
+    id: string;
+    url: string;
+    storagePath: string | null;
+    alt: string;
+}
+
+export interface Album {
+    id: string;
+    org: Org;
+    name: string;
+    slug: string;
+    coverImage: string;
+    images: AlbumImage[];
     createdAt: string;
 }
 
@@ -26,6 +58,14 @@ export interface BlogPost {
     updatedAt: string;
 }
 
+export interface CareerPost {
+    id: string;
+    title: string;
+    description: string;
+    link: string;
+    createdAt: string;
+}
+
 export interface StatsCounters {
     weddings: number;
     preWeddings: number;
@@ -42,9 +82,7 @@ export interface SocialLinks {
 }
 
 export interface SiteSettings {
-    logoUrl: string | null;
     heroVideoUrl: string | null;
-    kidsHeroVideoUrl: string | null;
     stats: StatsCounters;
     socialLinks: SocialLinks;
 }

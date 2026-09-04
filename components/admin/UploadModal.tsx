@@ -1,19 +1,21 @@
 "use client";
 
 import { useRef, useState } from "react";
-import type { GallerySection, GalleryMediaItem } from "@/lib/types";
+import type { GalleryMediaItem, Org } from "@/lib/types";
 import { uploadFile } from "@/lib/uploadClient";
 import { mapWithConcurrencyLimit } from "@/lib/concurrency";
 import { useToast } from "@/components/admin/Toast";
 
 interface UploadModalProps {
     open: boolean;
-    section: GallerySection;
+    org: Org;
+    categoryId: string;
+    categoryName: string;
     onClose: () => void;
     onUploaded: (items: GalleryMediaItem[]) => void;
 }
 
-export default function UploadModal({ open, section, onClose, onUploaded }: UploadModalProps) {
+export default function UploadModal({ open, org, categoryId, categoryName, onClose, onUploaded }: UploadModalProps) {
     const toast = useToast();
     const [files, setFiles] = useState<File[]>([]);
     const [uploading, setUploading] = useState(false);
@@ -43,7 +45,7 @@ export default function UploadModal({ open, section, onClose, onUploaded }: Uplo
             // during large batch uploads (see lib/concurrency.ts). Each result already
             // comes back as a full GalleryMediaItem row, persisted server-side.
             const uploaded = await mapWithConcurrencyLimit(files, 3, (file, index) =>
-                uploadFile(section, file, file.name || "", (fraction) => {
+                uploadFile("media", file, file.name || "", { org, categoryId }, (fraction) => {
                     perFileProgress[index] = fraction;
                     updateProgress();
                 })
@@ -69,7 +71,7 @@ export default function UploadModal({ open, section, onClose, onUploaded }: Uplo
             <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
                     <h2 className="text-lg font-semibold text-slate-900">
-                        Upload to <span className="capitalize text-purple-600">{section}</span>
+                        Upload to <span className="text-purple-600">{categoryName}</span>
                     </h2>
                     <button
                         type="button"

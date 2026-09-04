@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import SectionHeader from "@/components/SectionHeader";
 import type { GalleryMediaItem } from "@/lib/types";
 
@@ -8,6 +9,7 @@ interface GalleryGridSectionProps {
     images: GalleryMediaItem[];
     title?: string;
     subtitle?: string;
+    showMoreHref?: string;
 }
 
 function DynamicGalleryCard({ item }: { item: GalleryMediaItem }) {
@@ -30,6 +32,7 @@ export default function GalleryGridSection({
     images,
     title = "A Glimpse of Love and Laughter",
     subtitle = "Our Gallery",
+    showMoreHref,
 }: GalleryGridSectionProps) {
     // Distribute incoming array of images in exact array index order across 3 columns:
     const columnCount = 3;
@@ -55,6 +58,17 @@ export default function GalleryGridSection({
                         </div>
                     ))}
                 </div>
+
+                {showMoreHref && (
+                    <div className="flex justify-center mt-10">
+                        <Link
+                            href={showMoreHref}
+                            className="inline-flex items-center gap-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold px-7 py-3.5 transition-colors"
+                        >
+                            Show More
+                        </Link>
+                    </div>
+                )}
             </div>
         </section>
     );

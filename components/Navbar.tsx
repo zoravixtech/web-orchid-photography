@@ -6,6 +6,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { getAudienceFromHostname, getKidographyDomain, getWeddingDomain, type Audience } from "@/lib/config/domain";
 
+// Hardcoded per-org logo assets (task: logo is no longer admin-editable).
+// Both files already bake in the full wordmark, so they replace the
+// icon+text combo that used to sit here rather than sitting alongside it.
+const ORCHID_LOGO = "/orchid-logo.png";
+const KIDOGRAPHY_LOGO = "/kidography-logo.png";
+
 const noopSubscribe = () => () => {};
 
 function getClientAudience(): Audience {
@@ -13,12 +19,12 @@ function getClientAudience(): Audience {
 }
 
 function getServerAudience(): Audience {
-    return "wedding";
+    return "orchid";
 }
 
 function getClientSwitchHref(): string {
     const detected = getClientAudience();
-    const targetHost = detected === "wedding" ? getKidographyDomain() : getWeddingDomain();
+    const targetHost = detected === "orchid" ? getKidographyDomain() : getWeddingDomain();
     const port = window.location.port ? `:${window.location.port}` : "";
     return `${window.location.protocol}//${targetHost}${port}/`;
 }
@@ -36,28 +42,31 @@ interface NavItem {
 const leftNavItems: NavItem[] = [
     { id: "home", label: "Home", href: "/" },
     { id: "gallery", label: "Gallery", href: "/#gallery" },
-    { id: "services", label: "Services", href: "/#services" },
+    { id: "services", label: "Services", href: "/services" },
 ];
 
 const rightNavItems: NavItem[] = [
     { id: "about", label: "About Us", href: "/about" },
     { id: "contact", label: "Contact", href: "/#contact" },
-    { id: "carrer", label: "Career", href: "/about" },
+    { id: "career", label: "Career", href: "/career" },
     { id: "blog", label: "Blog", href: "/blog" },
 ];
 
-export default function Navbar({ logoUrl }: { logoUrl?: string | null }) {
+export default function Navbar({ org }: { org: Audience }) {
     const [isScrolled, setIsScrolled] = useState(false);
     const [activeSection, setActiveSection] = useState<string | null>(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const pathname = usePathname();
+
+    const logoSrc = org === "kidography" ? KIDOGRAPHY_LOGO : ORCHID_LOGO;
+    const logoAlt = org === "kidography" ? "The Orchid Kidography Logo" : "The Orchid Photography Logo";
 
     const audience = useSyncExternalStore(noopSubscribe, getClientAudience, getServerAudience);
     const switchHref = useSyncExternalStore(noopSubscribe, getClientSwitchHref, getServerSwitchHref);
 
     const switchNavItem: NavItem = {
         id: "switch",
-        label: audience === "wedding" ? "Kidography" : "Wedding",
+        label: audience === "orchid" ? "Kidography" : "Orchid",
         href: switchHref,
     };
 
@@ -88,7 +97,7 @@ export default function Navbar({ logoUrl }: { logoUrl?: string | null }) {
     useEffect(() => {
         if (pathname !== "/") return;
 
-        const sectionIds = ["home", "gallery", "services", "about", "contact", "blog"];
+        const sectionIds = ["home", "gallery", "about", "contact", "blog"];
         const sections = sectionIds.map((id) => document.getElementById(id));
 
         const observer = new IntersectionObserver(
@@ -115,14 +124,6 @@ export default function Navbar({ logoUrl }: { logoUrl?: string | null }) {
     const handleNavClick = (e: React.MouseEvent, item: NavItem) => {
         setIsMobileMenuOpen(false);
 
-        if (item.id === "carrer" && pathname === "/") {
-            e.preventDefault();
-            setActiveSection("about");
-            const element = document.getElementById("about");
-            if (element) element.scrollIntoView({ behavior: "smooth" });
-            return;
-        }
-
         if (pathname === "/" && item.href.startsWith("/#")) {
             const targetId = item.href.replace("/#", "");
             const element = document.getElementById(targetId);
@@ -141,6 +142,14 @@ export default function Navbar({ logoUrl }: { logoUrl?: string | null }) {
         ? "Blog"
         : pathname.startsWith("/about")
         ? "About"
+        : pathname.startsWith("/career")
+        ? "Career"
+        : pathname.startsWith("/services")
+        ? "Services"
+        : pathname.startsWith("/albums")
+        ? "Albums"
+        : pathname.startsWith("/gallery")
+        ? "Gallery"
         : activeSection
         ? activeSection.charAt(0).toUpperCase() + activeSection.slice(1)
         : "Home";
@@ -149,7 +158,9 @@ export default function Navbar({ logoUrl }: { logoUrl?: string | null }) {
         const isActive =
             (item.id === "home" && pathname === "/" && (activeSection === null || activeSection === "home")) ||
             (item.id === "blog" && pathname.startsWith("/blog")) ||
-            (item.id !== "carrer" && item.id !== "switch" && pathname === "/" && activeSection === item.id);
+            (item.id === "career" && pathname.startsWith("/career")) ||
+            (item.id === "services" && pathname.startsWith("/services")) ||
+            (item.id !== "switch" && pathname === "/" && activeSection === item.id);
 
         return (
             <Link
@@ -180,7 +191,7 @@ export default function Navbar({ logoUrl }: { logoUrl?: string | null }) {
                 isScrolled || isMobileMenuOpen
                     ? "bg-white/95 backdrop-blur-md border-b border-zinc-200/80 shadow-xs"
                     : isHome
-                    ? "bg-black/20 shadow-none"
+                    ? "bg-black/45 backdrop-blur-[2px] shadow-none"
                     : "bg-white border-b border-zinc-200/80 shadow-xs"
             }`}
         >
@@ -190,18 +201,13 @@ export default function Navbar({ logoUrl }: { logoUrl?: string | null }) {
                 <div className="flex items-center gap-2 lg:hidden">
                     <Link href="/" className="flex items-center gap-2 shrink-0">
                         <Image
-                            src={logoUrl || "/favicon.webp"}
-                            alt="Orchid Photography Logo"
-                            width={32}
-                            height={32}
+                            src={logoSrc}
+                            alt={logoAlt}
+                            width={100}
+                            height={org === "kidography" ? 100 : 141}
                             priority
-                            className="h-7 w-auto object-contain"
+                            className="h-10 w-auto object-contain"
                         />
-                        <span className={`font-serif text-base font-bold tracking-tight ${
-                            isScrolled || !isHome || isMobileMenuOpen ? "text-slate-900" : "text-white"
-                        }`}>
-                            Orchid
-                        </span>
                     </Link>
 
                     {/* Breadcrumb Separator & Location */}
@@ -244,21 +250,16 @@ export default function Navbar({ logoUrl }: { logoUrl?: string | null }) {
 
                     <Link
                         href="/"
-                        className="mx-2 sm:mx-4 md:mx-6 flex items-center gap-2 sm:gap-2.5 shrink-0 group"
+                        className="mx-2 sm:mx-4 md:mx-6 flex items-center shrink-0 group"
                     >
                         <Image
-                            src={logoUrl || "/favicon.webp"}
-                            alt="Orchid Photography Logo"
-                            width={40}
-                            height={40}
+                            src={logoSrc}
+                            alt={logoAlt}
+                            width={100}
+                            height={org === "kidography" ? 100 : 141}
                             priority
-                            className="h-8 sm:h-9 w-auto object-contain transition-transform group-hover:scale-105"
+                            className="h-14 sm:h-16 w-auto object-contain transition-transform group-hover:scale-105"
                         />
-                        <span className={`font-serif text-lg sm:text-xl font-bold tracking-tight transition-colors ${
-                            isScrolled || !isHome ? "text-slate-900" : "text-white"
-                        }`}>
-                            Orchid <span className="text-purple-600 font-normal">Photography</span>
-                        </span>
                     </Link>
 
                     <div className="flex items-center gap-4 sm:gap-6 md:gap-8">
@@ -275,7 +276,9 @@ export default function Navbar({ logoUrl }: { logoUrl?: string | null }) {
                             const isCurrent =
                                 (item.id === "home" && pathname === "/" && (activeSection === null || activeSection === "home")) ||
                                 (item.id === "blog" && pathname.startsWith("/blog")) ||
-                                (item.id !== "carrer" && item.id !== "switch" && pathname === "/" && activeSection === item.id);
+                                (item.id === "career" && pathname.startsWith("/career")) ||
+                                (item.id === "services" && pathname.startsWith("/services")) ||
+                                (item.id !== "switch" && pathname === "/" && activeSection === item.id);
 
                             return (
                                 <Link

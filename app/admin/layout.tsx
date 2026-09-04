@@ -1,7 +1,7 @@
 import { Montserrat } from "next/font/google";
 
 export const metadata = {
-    title: "Admin | Orchid Photography",
+    title: "Admin | The Orchid Photography",
 };
 
 const montserrat = Montserrat({

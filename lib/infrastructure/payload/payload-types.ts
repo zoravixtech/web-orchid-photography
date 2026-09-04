@@ -68,6 +68,9 @@ export interface Config {
   blocks: {};
   collections: {
     blogs: Blog;
+    careers: Career;
+    categories: Category;
+    albums: Album;
     'gallery-media': GalleryMedia;
     'hero-carousel': HeroCarousel;
     'payload-kv': PayloadKv;
@@ -79,6 +82,9 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     blogs: BlogsSelect<false> | BlogsSelect<true>;
+    careers: CareersSelect<false> | CareersSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    albums: AlbumsSelect<false> | AlbumsSelect<true>;
     'gallery-media': GalleryMediaSelect<false> | GalleryMediaSelect<true>;
     'hero-carousel': HeroCarouselSelect<false> | HeroCarouselSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -92,9 +98,13 @@ export interface Config {
   };
   fallbackLocale: null;
   globals: {
+    'site-settings-orchid': SiteSettingsOrchid;
+    'site-settings-kidography': SiteSettingsKidography;
     'site-settings': SiteSetting;
   };
   globalsSelect: {
+    'site-settings-orchid': SiteSettingsOrchidSelect<false> | SiteSettingsOrchidSelect<true>;
+    'site-settings-kidography': SiteSettingsKidographySelect<false> | SiteSettingsKidographySelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
   locale: null;
@@ -151,14 +161,61 @@ export interface Blog {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "careers".
+ */
+export interface Career {
+  id: number;
+  title: string;
+  description: string;
+  link: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: number;
+  org: 'orchid' | 'kidography';
+  name: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "albums".
+ */
+export interface Album {
+  id: number;
+  org: 'orchid' | 'kidography';
+  name: string;
+  slug?: string | null;
+  coverImage: string;
+  images?:
+    | {
+        url: string;
+        storagePath?: string | null;
+        alt?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "gallery-media".
  */
 export interface GalleryMedia {
   id: number;
-  section: 'gallery' | 'kids';
+  org?: ('orchid' | 'kidography') | null;
+  category?: (number | null) | Category;
   url: string;
   alt: string;
   storagePath?: string | null;
+  pinned?: boolean | null;
+  section?: ('gallery' | 'kids') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -224,6 +281,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'blogs';
         value: number | Blog;
+      } | null)
+    | ({
+        relationTo: 'careers';
+        value: number | Career;
+      } | null)
+    | ({
+        relationTo: 'categories';
+        value: number | Category;
+      } | null)
+    | ({
+        relationTo: 'albums';
+        value: number | Album;
       } | null)
     | ({
         relationTo: 'gallery-media';
@@ -296,13 +365,57 @@ export interface BlogsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "careers_select".
+ */
+export interface CareersSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  link?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  org?: T;
+  name?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "albums_select".
+ */
+export interface AlbumsSelect<T extends boolean = true> {
+  org?: T;
+  name?: T;
+  slug?: T;
+  coverImage?: T;
+  images?:
+    | T
+    | {
+        url?: T;
+        storagePath?: T;
+        alt?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "gallery-media_select".
  */
 export interface GalleryMediaSelect<T extends boolean = true> {
-  section?: T;
+  org?: T;
+  category?: T;
   url?: T;
   alt?: T;
   storagePath?: T;
+  pinned?: T;
+  section?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -379,13 +492,11 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "site-settings".
+ * via the `definition` "site-settings-orchid".
  */
-export interface SiteSetting {
+export interface SiteSettingsOrchid {
   id: number;
-  logoUrl?: string | null;
   heroVideoUrl?: string | null;
-  kidsHeroVideoUrl?: string | null;
   stats: {
     weddings: number;
     preWeddings: number;
@@ -401,6 +512,108 @@ export interface SiteSetting {
   };
   updatedAt?: string | null;
   createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings-kidography".
+ */
+export interface SiteSettingsKidography {
+  id: number;
+  heroVideoUrl?: string | null;
+  stats: {
+    weddings: number;
+    preWeddings: number;
+    babyPhotoshoots: number;
+    corporateInterior: number;
+  };
+  socialLinks?: {
+    whatsapp?: string | null;
+    facebook?: string | null;
+    instagram?: string | null;
+    youtube?: string | null;
+    linkedin?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  logoUrl?: string | null;
+  heroVideoUrl?: string | null;
+  kidsHeroVideoUrl?: string | null;
+  stats?: {
+    weddings?: number | null;
+    preWeddings?: number | null;
+    babyPhotoshoots?: number | null;
+    corporateInterior?: number | null;
+  };
+  socialLinks?: {
+    whatsapp?: string | null;
+    facebook?: string | null;
+    instagram?: string | null;
+    youtube?: string | null;
+    linkedin?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings-orchid_select".
+ */
+export interface SiteSettingsOrchidSelect<T extends boolean = true> {
+  heroVideoUrl?: T;
+  stats?:
+    | T
+    | {
+        weddings?: T;
+        preWeddings?: T;
+        babyPhotoshoots?: T;
+        corporateInterior?: T;
+      };
+  socialLinks?:
+    | T
+    | {
+        whatsapp?: T;
+        facebook?: T;
+        instagram?: T;
+        youtube?: T;
+        linkedin?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings-kidography_select".
+ */
+export interface SiteSettingsKidographySelect<T extends boolean = true> {
+  heroVideoUrl?: T;
+  stats?:
+    | T
+    | {
+        weddings?: T;
+        preWeddings?: T;
+        babyPhotoshoots?: T;
+        corporateInterior?: T;
+      };
+  socialLinks?:
+    | T
+    | {
+        whatsapp?: T;
+        facebook?: T;
+        instagram?: T;
+        youtube?: T;
+        linkedin?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

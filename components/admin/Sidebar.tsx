@@ -1,12 +1,21 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { logout } from "@/app/admin/actions/auth";
+import type { Org } from "@/lib/types";
 
-const navItems = [
+const LAST_ORG_STORAGE_KEY = "admin.lastOrg";
+
+function orgFromPathname(pathname: string): Org | null {
+    const match = pathname.match(/^\/admin\/(orchid|kidography)(\/|$)/);
+    return (match?.[1] as Org | undefined) ?? null;
+}
+
+const orgNavItems = (org: Org) => [
     {
-        href: "/admin",
+        href: `/admin/${org}`,
         label: "Settings",
         icon: (
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -16,8 +25,8 @@ const navItems = [
         ),
     },
     {
-        href: "/admin/gallery",
-        label: "Wedding Gallery",
+        href: `/admin/${org}/gallery`,
+        label: "Gallery",
         icon: (
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -25,14 +34,26 @@ const navItems = [
         ),
     },
     {
-        href: "/admin/gallery/kids",
-        label: "Kids Gallery",
+        href: `/admin/${org}/categories`,
+        label: "Categories",
         icon: (
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
             </svg>
         ),
     },
+    {
+        href: `/admin/${org}/albums`,
+        label: "Albums",
+        icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 7a2 2 0 012-2h3l2 2h9a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
+            </svg>
+        ),
+    },
+];
+
+const sharedNavItems = [
     {
         href: "/admin/blogs",
         label: "Blogs",
@@ -42,44 +63,131 @@ const navItems = [
             </svg>
         ),
     },
+    {
+        href: "/admin/career",
+        label: "Career",
+        icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m-4 6h16M5 19h14a2 2 0 002-2v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2z" />
+            </svg>
+        ),
+    },
 ];
+
+function readLastOrg(): Org {
+    if (typeof window === "undefined") return "orchid";
+    try {
+        const stored = window.localStorage.getItem(LAST_ORG_STORAGE_KEY);
+        return stored === "orchid" || stored === "kidography" ? stored : "orchid";
+    } catch {
+        return "orchid";
+    }
+}
 
 export default function Sidebar() {
     const pathname = usePathname();
+    const router = useRouter();
+    const pathOrg = orgFromPathname(pathname);
+    const [lastOrg] = useState<Org>(readLastOrg);
+
+    useEffect(() => {
+        if (!pathOrg) return;
+        try {
+            window.localStorage.setItem(LAST_ORG_STORAGE_KEY, pathOrg);
+        } catch {
+            // Storage unavailable — the switcher just falls back to "orchid" on shared pages.
+        }
+    }, [pathOrg]);
+
+    const activeOrg = pathOrg ?? lastOrg;
+
+    const switchOrg = (nextOrg: Org) => {
+        if (nextOrg === activeOrg) return;
+        if (pathOrg) {
+            router.push(pathname.replace(`/admin/${pathOrg}`, `/admin/${nextOrg}`));
+        } else {
+            router.push(`/admin/${nextOrg}`);
+        }
+    };
 
     return (
         <aside className="fixed inset-y-0 left-0 z-40 w-64 flex flex-col bg-slate-900 text-slate-300">
             <div className="flex items-center gap-2 px-6 h-16 border-b border-slate-800">
                 <span className="font-bold text-lg text-white whitespace-nowrap">
-                    Orchid<span className="text-purple-400">.</span>
+                    The Orchid<span className="text-purple-400">.</span>
                 </span>
                 <span className="text-[10px] uppercase tracking-widest text-slate-400 mt-1">
                     Admin
                 </span>
             </div>
 
-            <nav className="flex-1 py-4 space-y-1 px-3">
-                {navItems.map((item) => {
-                    const isActive =
-                        item.href === "/admin/blogs"
-                            ? pathname.startsWith("/admin/blogs")
-                            : pathname === item.href;
-
-                    return (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                                isActive
-                                    ? "bg-purple-600/20 text-purple-300 border-l-2 border-purple-500"
-                                    : "hover:bg-slate-800 hover:text-white"
+            {/* Org switcher */}
+            <div className="p-3 border-b border-slate-800">
+                <div className="flex rounded-lg border border-slate-700 overflow-hidden">
+                    {(["orchid", "kidography"] as Org[]).map((org) => (
+                        <button
+                            key={org}
+                            type="button"
+                            onClick={() => switchOrg(org)}
+                            className={`flex-1 px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-colors capitalize ${
+                                activeOrg === org
+                                    ? "bg-purple-600 text-white"
+                                    : "bg-transparent text-slate-400 hover:bg-slate-800 hover:text-white"
                             }`}
                         >
-                            <span className="shrink-0">{item.icon}</span>
-                            <span className="whitespace-nowrap">{item.label}</span>
-                        </Link>
-                    );
-                })}
+                            {org}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            <nav className="flex-1 overflow-y-auto py-4 space-y-6 px-3">
+                <div className="space-y-1">
+                    <p className="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+                        {activeOrg} content
+                    </p>
+                    {orgNavItems(activeOrg).map((item) => {
+                        const isActive =
+                            item.label === "Settings" ? pathname === item.href : pathname.startsWith(item.href);
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                                    isActive
+                                        ? "bg-purple-600/20 text-purple-300 border-l-2 border-purple-500"
+                                        : "hover:bg-slate-800 hover:text-white"
+                                }`}
+                            >
+                                <span className="shrink-0">{item.icon}</span>
+                                <span className="whitespace-nowrap">{item.label}</span>
+                            </Link>
+                        );
+                    })}
+                </div>
+
+                <div className="space-y-1">
+                    <p className="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+                        Shared
+                    </p>
+                    {sharedNavItems.map((item) => {
+                        const isActive = pathname.startsWith(item.href);
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                                    isActive
+                                        ? "bg-purple-600/20 text-purple-300 border-l-2 border-purple-500"
+                                        : "hover:bg-slate-800 hover:text-white"
+                                }`}
+                            >
+                                <span className="shrink-0">{item.icon}</span>
+                                <span className="whitespace-nowrap">{item.label}</span>
+                            </Link>
+                        );
+                    })}
+                </div>
             </nav>
 
             <div className="p-3 border-t border-slate-800 space-y-1">

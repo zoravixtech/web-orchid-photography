@@ -10,22 +10,22 @@ import config from "../payload.config.mts";
  * Run with: pnpm seed
  */
 
-const galleryItems: { section: "gallery" | "kids"; url: string; alt: string }[] = [
-    { section: "gallery", url: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=1200&auto=format&fit=crop", alt: "Bride in Red Veil" },
-    { section: "gallery", url: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=1000&auto=format&fit=crop", alt: "Mandap Wedding Ceremony" },
-    { section: "gallery", url: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=1000&auto=format&fit=crop", alt: "Bride Red Dupatta Detail" },
-    { section: "gallery", url: "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1000&auto=format&fit=crop", alt: "Couple Wedding Portrait" },
-    { section: "gallery", url: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1000&auto=format&fit=crop", alt: "Candid Moment" },
-    { section: "gallery", url: "https://images.unsplash.com/photo-1537633552985-df8429e8048b?q=80&w=1000&auto=format&fit=crop", alt: "Bridal Preparation" },
-    { section: "kids", url: "https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=1000&auto=format&fit=crop", alt: "Newborn Baby Sleeping" },
-    { section: "kids", url: "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=1000&auto=format&fit=crop", alt: "Smiling Toddler Portrait" },
-    { section: "kids", url: "https://images.unsplash.com/photo-1543807535-eceef0bc6599?q=80&w=1000&auto=format&fit=crop", alt: "Kid Playing in Garden" },
-    { section: "kids", url: "https://images.unsplash.com/photo-1471286174890-9c112ffca5b4?q=80&w=1000&auto=format&fit=crop", alt: "Cute Baby Portrait" },
-    { section: "kids", url: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?q=80&w=1000&auto=format&fit=crop", alt: "Kids Celebration" },
-    { section: "kids", url: "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?q=80&w=1000&auto=format&fit=crop", alt: "Little Girl Laughing" },
-    { section: "kids", url: "https://images.unsplash.com/photo-1510154221590-ff63e90a136f?q=80&w=1000&auto=format&fit=crop", alt: "Baby First Birthday" },
-    { section: "kids", url: "https://images.unsplash.com/photo-1485546246426-74dc88dec4d9?q=80&w=1000&auto=format&fit=crop", alt: "Childhood Magic" },
-    { section: "kids", url: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1000&auto=format&fit=crop", alt: "Baby Rice Ceremony" },
+const galleryItems: { org: "orchid" | "kidography"; url: string; alt: string }[] = [
+    { org: "orchid", url: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=1200&auto=format&fit=crop", alt: "Bride in Red Veil" },
+    { org: "orchid", url: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=1000&auto=format&fit=crop", alt: "Mandap Wedding Ceremony" },
+    { org: "orchid", url: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=1000&auto=format&fit=crop", alt: "Bride Red Dupatta Detail" },
+    { org: "orchid", url: "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1000&auto=format&fit=crop", alt: "Couple Wedding Portrait" },
+    { org: "orchid", url: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1000&auto=format&fit=crop", alt: "Candid Moment" },
+    { org: "orchid", url: "https://images.unsplash.com/photo-1537633552985-df8429e8048b?q=80&w=1000&auto=format&fit=crop", alt: "Bridal Preparation" },
+    { org: "kidography", url: "https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=1000&auto=format&fit=crop", alt: "Newborn Baby Sleeping" },
+    { org: "kidography", url: "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=1000&auto=format&fit=crop", alt: "Smiling Toddler Portrait" },
+    { org: "kidography", url: "https://images.unsplash.com/photo-1543807535-eceef0bc6599?q=80&w=1000&auto=format&fit=crop", alt: "Kid Playing in Garden" },
+    { org: "kidography", url: "https://images.unsplash.com/photo-1471286174890-9c112ffca5b4?q=80&w=1000&auto=format&fit=crop", alt: "Cute Baby Portrait" },
+    { org: "kidography", url: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?q=80&w=1000&auto=format&fit=crop", alt: "Kids Celebration" },
+    { org: "kidography", url: "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?q=80&w=1000&auto=format&fit=crop", alt: "Little Girl Laughing" },
+    { org: "kidography", url: "https://images.unsplash.com/photo-1510154221590-ff63e90a136f?q=80&w=1000&auto=format&fit=crop", alt: "Baby First Birthday" },
+    { org: "kidography", url: "https://images.unsplash.com/photo-1485546246426-74dc88dec4d9?q=80&w=1000&auto=format&fit=crop", alt: "Childhood Magic" },
+    { org: "kidography", url: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1000&auto=format&fit=crop", alt: "Baby Rice Ceremony" },
 ];
 
 const blogs = [
@@ -120,13 +120,35 @@ const blogs = [
     },
 ];
 
+async function ensureDefaultCategory(payload: Awaited<ReturnType<typeof getPayload>>, org: "orchid" | "kidography") {
+    const { docs } = await payload.find({
+        collection: "categories",
+        where: { and: [{ org: { equals: org } }, { name: { equals: "Uncategorized" } }] },
+        limit: 1,
+    });
+    if (docs.length > 0) return docs[0].id;
+    const created = await payload.create({ collection: "categories", data: { org, name: "Uncategorized" } });
+    return created.id;
+}
+
 async function main() {
     const payload = await getPayload({ config });
 
     const { totalDocs: galleryCount } = await payload.count({ collection: "gallery-media" });
     if (galleryCount === 0) {
+        const orchidCategoryId = await ensureDefaultCategory(payload, "orchid");
+        const kidographyCategoryId = await ensureDefaultCategory(payload, "kidography");
         for (const item of galleryItems) {
-            await payload.create({ collection: "gallery-media", data: { ...item, storagePath: null } });
+            await payload.create({
+                collection: "gallery-media",
+                data: {
+                    org: item.org,
+                    category: item.org === "orchid" ? orchidCategoryId : kidographyCategoryId,
+                    url: item.url,
+                    alt: item.alt,
+                    storagePath: null,
+                },
+            });
         }
         console.log(`Seeded ${galleryItems.length} gallery media items.`);
     } else {

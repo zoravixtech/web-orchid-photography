@@ -1,19 +1,8 @@
-import SettingsForm from "@/components/admin/SettingsForm";
-import { getSiteSettings } from "@/lib/data/settings";
+import { redirect } from "next/navigation";
 
-export default async function AdminHomePage() {
-    const settings = await getSiteSettings();
-
-    return (
-        <div className="w-full">
-            <header className="mb-8">
-                <h1 className="text-2xl font-bold text-slate-900">Settings</h1>
-                <p className="text-sm text-slate-500 mt-1">
-                    Customize the branding shown across the public website.
-                </p>
-            </header>
-
-            <SettingsForm initialSettings={settings} />
-        </div>
-    );
+// Org-scoped Settings now lives at /admin/[org]; land here on the last
+// active org isn't knowable server-side (no cookie of record), so default
+// to Orchid.
+export default function AdminRootPage() {
+    redirect("/admin/orchid");
 }

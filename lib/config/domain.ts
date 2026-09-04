@@ -7,7 +7,7 @@
 // NEXT_PUBLIC_SITE_URL elsewhere in this app) so they're inlined into the
 // client bundle at build time. The *_DEV pair is used in development because
 // the real *.com domains can't be pointed at localhost.
-export type Audience = "wedding" | "kidography";
+export type Audience = "orchid" | "kidography";
 
 function isDev(): boolean {
     return process.env.NODE_ENV === "development";
@@ -27,5 +27,5 @@ export function getKidographyDomain(): string {
 
 export function getAudienceFromHostname(hostname: string | null | undefined): Audience {
     const host = (hostname ?? "").toLowerCase().split(":")[0];
-    return host === getKidographyDomain().toLowerCase() ? "kidography" : "wedding";
+    return host === getKidographyDomain().toLowerCase() ? "kidography" : "orchid";
 }

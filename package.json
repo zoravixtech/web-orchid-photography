@@ -11,7 +11,8 @@
     "postinstall": "node scripts/copy-ffmpeg-core.mjs",
     "start": "next start",
     "lint": "eslint",
-    "seed": "payload run scripts/seed.mts"
+    "seed": "payload run scripts/seed.mts",
+    "migrate:org-schema": "payload run scripts/migrate-org-schema.mts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1116.0",

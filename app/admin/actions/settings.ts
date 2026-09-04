@@ -4,7 +4,7 @@ import { revalidatePath, updateTag } from "next/cache";
 import { getSettingsRepository } from "@/lib/infrastructure";
 import { requireAdmin } from "@/lib/auth/session";
 import { SETTINGS_TAG } from "@/lib/data/settings";
-import type { SocialLinks, StatsCounters } from "@/lib/types";
+import type { Org, SocialLinks, StatsCounters } from "@/lib/types";
 
 export interface SettingsActionResult {
     error?: string;
@@ -12,22 +12,20 @@ export interface SettingsActionResult {
 }
 
 export interface UpdateSettingsInput {
-    logoUrl: string | null;
     stats: StatsCounters;
     socialLinks: SocialLinks;
 }
 
-export async function updateSettings(input: UpdateSettingsInput): Promise<SettingsActionResult> {
+export async function updateSettings(org: Org, input: UpdateSettingsInput): Promise<SettingsActionResult> {
     await requireAdmin();
 
     const repo = getSettingsRepository();
     if (!repo) return { error: "Database is not configured." };
 
-    await repo.update({
-        logoUrl: input.logoUrl,
-        // Hero video URLs are read-only here (persisted immediately via the
+    await repo.update(org, {
+        // Hero video URL is read-only here (persisted immediately via the
         // dedicated upload flow in /api/admin/upload) — omitted so this save
-        // doesn't clobber them.
+        // doesn't clobber it.
         stats: input.stats,
         socialLinks: input.socialLinks,
     });

@@ -13,7 +13,7 @@ export default function AboutStorySection() {
                         <div className="relative aspect-4/3 w-full rounded-3xl overflow-hidden shadow-2xl border border-purple-100/80">
                             <Image
                                 src="https://images.prismic.io/chobirkotha2/ZwluB4F3NbkBXWlZ_Chobirkothagroupphoto-23.jpg?auto=format%2Ccompress&rect=22%2C0%2C5998%2C4027&w=1200&fit=max"
-                                alt="Orchid Photography Team Group"
+                                alt="The Orchid Photography Team Group"
                                 fill
                                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                                 sizes="(max-width: 1024px) 100vw, 50vw"
@@ -32,7 +32,7 @@ export default function AboutStorySection() {
                         <div className="flex items-center gap-2 mb-3">
                             <span className="w-8 h-0.5 bg-purple-600 rounded-full" />
                             <span className="font-serif text-xs font-semibold tracking-[0.3em] uppercase text-purple-600">
-                                About Orchid Photography
+                                About The Orchid Photography
                             </span>
                         </div>
 
@@ -44,7 +44,7 @@ export default function AboutStorySection() {
                         {/* Story Body Paragraphs */}
                         <div className="space-y-4 text-slate-600 text-sm sm:text-base leading-relaxed">
                             <p>
-                                We at <strong className="text-slate-900 font-semibold">Orchid Photography</strong> believe every love story must be told with lovely words and timeless imagery. Being one of the premier wedding photography teams in Kolkata and across India, we specialize in taking raw emotions, candid moments, and subtle details to create unforgettable memories of the most important day of your life.
+                                We at <strong className="text-slate-900 font-semibold">The Orchid Photography</strong> believe every love story must be told with lovely words and timeless imagery. Being one of the premier wedding photography teams in Kolkata and across India, we specialize in taking raw emotions, candid moments, and subtle details to create unforgettable memories of the most important day of your life.
                             </p>
                             <p>
                                 Our team resonates creativity with professionalism so that you feel at ease while we capture every smile, tear, and happy celebration. We are deeply passionate about visual storytelling through candid photography and cinematic films.

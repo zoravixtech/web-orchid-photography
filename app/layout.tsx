@@ -13,8 +13,8 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://web-orchid-photogra
 export const metadata: Metadata = {
     metadataBase: new URL(siteUrl),
     title: {
-        default: "Orchid Photography | Best Wedding Photographers in Kolkata & India",
-        template: "%s | Orchid Photography Kolkata",
+        default: "The Orchid Photography | Best Wedding Photographers in Kolkata & India",
+        template: "%s | The Orchid Photography Kolkata",
     },
     description:
         "Award-winning professional wedding photographers in Kolkata, specializing in candid wedding photography, cinematic wedding films, destination weddings, and pre-wedding shoots across India.",
@@ -25,16 +25,16 @@ export const metadata: Metadata = {
         "Pre-wedding Shoot Kolkata",
         "Destination Wedding Photographer India",
         "Cinematic Wedding Video Kolkata",
-        "Orchid Photography Kolkata",
+        "The Orchid Photography Kolkata",
         "Bengali Wedding Photography",
         "Best Photographers in Kolkata",
         "Wedding Cost Guide Kolkata",
         "Luxury Wedding Photography",
         "Kidography Kolkata",
     ],
-    authors: [{ name: "Orchid Photography", url: siteUrl }],
-    creator: "Orchid Photography",
-    publisher: "Orchid Photography",
+    authors: [{ name: "The Orchid Photography", url: siteUrl }],
+    creator: "The Orchid Photography",
+    publisher: "The Orchid Photography",
     category: "Photography",
     icons: {
         icon: "/favicon.webp",
@@ -48,8 +48,8 @@ export const metadata: Metadata = {
         type: "website",
         locale: "en_IN",
         url: siteUrl,
-        siteName: "Orchid Photography",
-        title: "Orchid Photography | Best Wedding Photographers in Kolkata & India",
+        siteName: "The Orchid Photography",
+        title: "The Orchid Photography | Best Wedding Photographers in Kolkata & India",
         description:
             "Award-winning professional wedding photographers in Kolkata & all over India. Specializing in candid photography, pre-wedding shoots, and cinematic wedding films.",
         images: [
@@ -57,13 +57,13 @@ export const metadata: Metadata = {
                 url: "/favicon.webp",
                 width: 1200,
                 height: 630,
-                alt: "Orchid Photography - Best Wedding Photographers in Kolkata",
+                alt: "The Orchid Photography - Best Wedding Photographers in Kolkata",
             },
         ],
     },
     twitter: {
         card: "summary_large_image",
-        title: "Orchid Photography | Best Wedding Photographers in Kolkata",
+        title: "The Orchid Photography | Best Wedding Photographers in Kolkata",
         description:
             "Award-winning professional wedding photographers in Kolkata & all over India. Specializing in candid photography, pre-wedding shoots, and cinematic wedding films.",
         images: ["/favicon.webp"],
@@ -84,7 +84,7 @@ export const metadata: Metadata = {
 const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Photographer",
-    "name": "Orchid Photography",
+    "name": "The Orchid Photography",
     "image": `${siteUrl}/favicon.webp`,
     "@id": siteUrl,
     "url": siteUrl,

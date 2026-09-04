@@ -41,8 +41,17 @@ const nextConfig: NextConfig = {
     // Local dev stores media in MinIO on localhost (see STORAGE_PUBLIC_URL_BASE).
     // Next.js blocks image optimization fetches to private IPs unless allowed.
     dangerouslyAllowLocalIP: true,
-    // Next.js will optimize images on the fly via /_next/image.
-    // For large historical uploads (10MB+), the 30s timeout below gives sharp enough time.
+    // Server-side re-optimization is disabled: every upload is already
+    // resized (<=1920px) and re-encoded to WebP client-side before it ever
+    // reaches storage (see lib/imageCompression.ts), so re-optimizing again
+    // via /_next/image buys little. It also isn't safe to rely on — Next's
+    // optimizer fetches the remote source with a *hardcoded* 7s timeout
+    // (independent of `experimental.imgOptTimeoutInSeconds` below, which
+    // only bounds the sharp resize step *after* a successful fetch), so any
+    // slow moment from R2/Cloudflare 500s the image instead of just being
+    // slightly slower. next/image still gives lazy-loading/layout benefits
+    // without going through the optimizer.
+    unoptimized: true,
   },
   // Payload/Drizzle pull in Node-only tooling (drizzle-kit's esbuild-register,
   // native SQLite bindings, ...) that Turbopack/webpack can't usefully bundle
