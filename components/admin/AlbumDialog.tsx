@@ -6,6 +6,7 @@ import { createAlbum, updateAlbum, addAlbumImages, removeAlbumImage } from "@/ap
 import { uploadFile } from "@/lib/uploadClient";
 import { useToast } from "@/components/admin/Toast";
 import { mapWithConcurrencyLimit } from "@/lib/concurrency";
+import CoverPositionPicker from "@/components/admin/CoverPositionPicker";
 import type { Album, Org } from "@/lib/types";
 
 interface AlbumDialogProps {
@@ -25,10 +26,14 @@ export default function AlbumDialog({ org, initialAlbum, onClose, onSaved }: Alb
     const [album, setAlbum] = useState<Album | null>(initialAlbum ?? null);
     const [name, setName] = useState(initialAlbum?.name ?? "");
     const [coverImage, setCoverImage] = useState(initialAlbum?.coverImage ?? "");
+    const [coverPosition, setCoverPosition] = useState(initialAlbum?.coverPosition || "50% 50%");
+    const [address, setAddress] = useState(initialAlbum?.address ?? "");
+    const [venue, setVenue] = useState(initialAlbum?.venue ?? "");
+    const [category, setCategory] = useState(initialAlbum?.category ?? "");
     const [creating, setCreating] = useState(false);
     const [uploadingCover, setUploadingCover] = useState(false);
     const [coverProgress, setCoverProgress] = useState(0);
-    const [savingName, setSavingName] = useState(false);
+    const [savingDetails, setSavingDetails] = useState(false);
     const [uploadingImages, setUploadingImages] = useState(false);
     const [imagesProgress, setImagesProgress] = useState(0);
     const [removingId, setRemovingId] = useState<string | null>(null);
@@ -41,12 +46,14 @@ export default function AlbumDialog({ org, initialAlbum, onClose, onSaved }: Alb
         try {
             const { publicUrl } = await uploadFile("albumCover", file, name || "Album cover", {}, setCoverProgress);
             setCoverImage(publicUrl);
+            // A freshly uploaded image has no meaningful focal point yet.
+            setCoverPosition("50% 50%");
 
             // If we're editing an already-created album, persist the new
             // cover immediately; in create mode it's just held in state
             // until the album itself is created below.
             if (album) {
-                const result = await updateAlbum(album.id, org, { coverImage: publicUrl });
+                const result = await updateAlbum(album.id, org, { coverImage: publicUrl, coverPosition: "50% 50%" });
                 if (result.error || !result.album) {
                     toast.error(result.error ?? "Failed to save cover image.");
                     return;
@@ -64,11 +71,34 @@ export default function AlbumDialog({ org, initialAlbum, onClose, onSaved }: Alb
         }
     };
 
+    const handleCoverPositionCommit = async (nextPosition: string) => {
+        if (!album || nextPosition === album.coverPosition) return;
+        try {
+            const result = await updateAlbum(album.id, org, { coverPosition: nextPosition });
+            if (result.error || !result.album) {
+                toast.error(result.error ?? "Failed to save cover position.");
+                return;
+            }
+            setAlbum(result.album);
+            onSaved(result.album);
+        } catch (err) {
+            console.error("Album cover position update failed:", err);
+            toast.error(err instanceof Error ? err.message : "Failed to save cover position.");
+        }
+    };
+
     const handleCreate = async () => {
         if (!name.trim() || !coverImage) return;
         setCreating(true);
         try {
-            const result = await createAlbum(org, name, coverImage);
+            const result = await createAlbum(org, {
+                name,
+                coverImage,
+                coverPosition,
+                address: address.trim(),
+                venue: venue.trim(),
+                category: category.trim(),
+            });
             if (result.error || !result.album) {
                 toast.error(result.error ?? "Failed to create album.");
                 return;
@@ -84,20 +114,32 @@ export default function AlbumDialog({ org, initialAlbum, onClose, onSaved }: Alb
         }
     };
 
-    const handleSaveName = async () => {
-        if (!album || !name.trim() || name === album.name) return;
-        setSavingName(true);
+    const detailsChanged =
+        !!album &&
+        (name.trim() !== album.name ||
+            address.trim() !== album.address ||
+            venue.trim() !== album.venue ||
+            category.trim() !== album.category);
+
+    const handleSaveDetails = async () => {
+        if (!album || !name.trim() || !detailsChanged) return;
+        setSavingDetails(true);
         try {
-            const result = await updateAlbum(album.id, org, { name: name.trim() });
+            const result = await updateAlbum(album.id, org, {
+                name: name.trim(),
+                address: address.trim(),
+                venue: venue.trim(),
+                category: category.trim(),
+            });
             if (result.error || !result.album) {
-                toast.error(result.error ?? "Failed to update name.");
+                toast.error(result.error ?? "Failed to update album details.");
                 return;
             }
             setAlbum(result.album);
             onSaved(result.album);
-            toast.success("Album name updated.");
+            toast.success("Album details updated.");
         } finally {
-            setSavingName(false);
+            setSavingDetails(false);
         }
     };
 
@@ -172,16 +214,21 @@ export default function AlbumDialog({ org, initialAlbum, onClose, onSaved }: Alb
                 </div>
 
                 <div className="p-6 space-y-6">
-                    <section className="flex flex-col sm:flex-row gap-6">
+                    <section className="space-y-4">
                         <div>
                             <p className="block text-xs font-medium text-slate-500 mb-1">Cover Image</p>
-                            <div className="w-40 aspect-16/10 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center">
-                                {coverImage ? (
-                                    <Image src={coverImage} alt="Cover preview" width={160} height={100} className="w-full h-full object-cover" />
-                                ) : (
+                            {coverImage ? (
+                                <CoverPositionPicker
+                                    src={coverImage}
+                                    position={coverPosition}
+                                    onChange={setCoverPosition}
+                                    onCommit={handleCoverPositionCommit}
+                                />
+                            ) : (
+                                <div className="w-full aspect-21/9 rounded-lg overflow-hidden bg-slate-100 border border-dashed border-slate-300 flex items-center justify-center">
                                     <span className="text-xs text-slate-400">No image</span>
-                                )}
-                            </div>
+                                </div>
+                            )}
                             <input
                                 ref={coverInputRef}
                                 type="file"
@@ -211,11 +258,11 @@ export default function AlbumDialog({ org, initialAlbum, onClose, onSaved }: Alb
                             )}
                         </div>
 
-                        <div className="flex-1">
-                            <label htmlFor="album-name" className="block text-xs font-medium text-slate-500 mb-1">
-                                Name
-                            </label>
-                            <div className="flex items-center gap-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="sm:col-span-2">
+                                <label htmlFor="album-name" className="block text-xs font-medium text-slate-500 mb-1">
+                                    Name
+                                </label>
                                 <input
                                     id="album-name"
                                     type="text"
@@ -224,34 +271,75 @@ export default function AlbumDialog({ org, initialAlbum, onClose, onSaved }: Alb
                                     placeholder="e.g. Rahul & Priya's Wedding"
                                     className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
-                                {album && (
-                                    <button
-                                        type="button"
-                                        onClick={handleSaveName}
-                                        disabled={savingName || !name.trim() || name === album.name}
-                                        className="shrink-0 rounded-lg bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white text-sm font-semibold px-4 py-2 transition-colors"
-                                    >
-                                        {savingName ? "Saving…" : "Save"}
-                                    </button>
+                                {album ? (
+                                    <p className="text-xs text-slate-400 mt-1">/{album.slug}</p>
+                                ) : (
+                                    <p className="text-xs text-slate-400 mt-1">The URL slug is generated automatically from the name.</p>
                                 )}
                             </div>
-                            {album ? (
-                                <p className="text-xs text-slate-400 mt-1">/{album.slug}</p>
-                            ) : (
-                                <p className="text-xs text-slate-400 mt-1">The URL slug is generated automatically from the name.</p>
-                            )}
 
-                            {!album && (
-                                <button
-                                    type="button"
-                                    onClick={handleCreate}
-                                    disabled={creating || uploadingCover || !name.trim() || !coverImage}
-                                    className="mt-4 rounded-lg bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-6 py-2.5 transition-colors"
-                                >
-                                    {creating ? "Creating…" : "Create Album"}
-                                </button>
-                            )}
+                            <div>
+                                <label htmlFor="album-venue" className="block text-xs font-medium text-slate-500 mb-1">
+                                    Venue
+                                </label>
+                                <input
+                                    id="album-venue"
+                                    type="text"
+                                    value={venue}
+                                    onChange={(e) => setVenue(e.target.value)}
+                                    placeholder="e.g. ITC Fortune Park"
+                                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                />
+                            </div>
+
+                            <div>
+                                <label htmlFor="album-address" className="block text-xs font-medium text-slate-500 mb-1">
+                                    Address
+                                </label>
+                                <input
+                                    id="album-address"
+                                    type="text"
+                                    value={address}
+                                    onChange={(e) => setAddress(e.target.value)}
+                                    placeholder="e.g. Panchwati, Kolkata"
+                                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                />
+                            </div>
+
+                            <div className="sm:col-span-2">
+                                <label htmlFor="album-category" className="block text-xs font-medium text-slate-500 mb-1">
+                                    Category
+                                </label>
+                                <input
+                                    id="album-category"
+                                    type="text"
+                                    value={category}
+                                    onChange={(e) => setCategory(e.target.value)}
+                                    placeholder="e.g. Big Fat Marwari Wedding"
+                                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                />
+                            </div>
                         </div>
+
+                        {album ? (
+                            <button
+                                type="button"
+                                onClick={handleSaveDetails}
+                                disabled={savingDetails || !name.trim() || !detailsChanged}
+                                className="rounded-lg bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white text-sm font-semibold px-5 py-2 transition-colors"
+                            >
+                                {savingDetails ? "Saving…" : "Save Details"}
+                            </button>
+                        ) : (
+                            <button
+                                type="button"
+                                onClick={handleCreate}
+                                disabled={creating || uploadingCover || !name.trim() || !coverImage}
+                                className="rounded-lg bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-6 py-2.5 transition-colors"
+                            >
+                                {creating ? "Creating…" : "Create Album"}
+                            </button>
+                        )}
                     </section>
 
                     {album && (

@@ -4,8 +4,6 @@ import type { Audience } from '@/lib/config/domain'
 import type { SocialLinks } from '@/lib/types'
 
 // Hardcoded per-org logo assets (task: logo is no longer admin-editable).
-// Both files already bake in the full wordmark, so they replace the
-// icon+text combo that used to sit here rather than sitting alongside it.
 const ORCHID_LOGO = '/orchid-logo.png'
 const KIDOGRAPHY_LOGO = '/kidography-logo.png'
 
@@ -36,7 +34,7 @@ export default function Footer({
                   alt={logoAlt}
                   width={100}
                   height={org === 'kidography' ? 100 : 141}
-                  className="h-16 w-auto object-contain transition-transform group-hover:scale-105"
+                  className="h-36 w-auto object-contain transition-transform group-hover:scale-105"
                 />
               </Link>
             </div>
@@ -69,7 +67,7 @@ export default function Footer({
                 </Link>
               </li>
               <li>
-                <Link href="/#gallery" className="hover:text-purple-400 transition-colors">
+                <Link href="/gallery" className="hover:text-purple-400 transition-colors">
                   Gallery
                 </Link>
               </li>

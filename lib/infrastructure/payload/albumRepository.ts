@@ -21,6 +21,10 @@ interface AlbumDoc {
     name: string;
     slug: string;
     coverImage: string;
+    coverPosition: string | null;
+    address: string | null;
+    venue: string | null;
+    category: string | null;
     images: AlbumImageDoc[] | null;
     createdAt: string;
 }
@@ -32,6 +36,10 @@ function mapDoc(doc: AlbumDoc): Album {
         name: doc.name,
         slug: doc.slug,
         coverImage: normalizeMediaUrl(doc.coverImage),
+        coverPosition: doc.coverPosition || "50% 50%",
+        address: doc.address ?? "",
+        venue: doc.venue ?? "",
+        category: doc.category ?? "",
         images: (doc.images ?? []).map((image) => ({
             id: image.id,
             url: normalizeMediaUrl(image.url, image.storagePath),
@@ -80,7 +88,16 @@ export class PayloadAlbumRepository implements AlbumRepository {
         const payload = await this.payloadPromise;
         const doc = (await payload.create({
             collection: "albums",
-            data: { org: input.org, name: input.name, coverImage: input.coverImage, images: [] },
+            data: {
+                org: input.org,
+                name: input.name,
+                coverImage: input.coverImage,
+                coverPosition: input.coverPosition ?? "50% 50%",
+                address: input.address ?? "",
+                venue: input.venue ?? "",
+                category: input.category ?? "",
+                images: [],
+            },
         })) as AlbumDoc;
         return mapDoc(doc);
     }
@@ -93,6 +110,10 @@ export class PayloadAlbumRepository implements AlbumRepository {
             data: {
                 ...(input.name !== undefined ? { name: input.name } : {}),
                 ...(input.coverImage !== undefined ? { coverImage: input.coverImage } : {}),
+                ...(input.coverPosition !== undefined ? { coverPosition: input.coverPosition } : {}),
+                ...(input.address !== undefined ? { address: input.address } : {}),
+                ...(input.venue !== undefined ? { venue: input.venue } : {}),
+                ...(input.category !== undefined ? { category: input.category } : {}),
             },
         })) as AlbumDoc;
         return mapDoc(doc);

@@ -4,11 +4,19 @@ export interface CreateAlbumInput {
     org: Org;
     name: string;
     coverImage: string;
+    coverPosition?: string;
+    address?: string;
+    venue?: string;
+    category?: string;
 }
 
 export interface UpdateAlbumInput {
     name?: string;
     coverImage?: string;
+    coverPosition?: string;
+    address?: string;
+    venue?: string;
+    category?: string;
 }
 
 export interface AddAlbumImageInput {

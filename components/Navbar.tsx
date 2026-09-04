@@ -7,12 +7,10 @@ import { usePathname } from "next/navigation";
 import { getAudienceFromHostname, getKidographyDomain, getWeddingDomain, type Audience } from "@/lib/config/domain";
 
 // Hardcoded per-org logo assets (task: logo is no longer admin-editable).
-// Both files already bake in the full wordmark, so they replace the
-// icon+text combo that used to sit here rather than sitting alongside it.
 const ORCHID_LOGO = "/orchid-logo.png";
 const KIDOGRAPHY_LOGO = "/kidography-logo.png";
 
-const noopSubscribe = () => () => {};
+const noopSubscribe = () => () => { };
 
 function getClientAudience(): Audience {
     return getAudienceFromHostname(window.location.hostname);
@@ -41,7 +39,7 @@ interface NavItem {
 
 const leftNavItems: NavItem[] = [
     { id: "home", label: "Home", href: "/" },
-    { id: "gallery", label: "Gallery", href: "/#gallery" },
+    { id: "gallery", label: "Gallery", href: "/gallery" },
     { id: "services", label: "Services", href: "/services" },
 ];
 
@@ -97,7 +95,7 @@ export default function Navbar({ org }: { org: Audience }) {
     useEffect(() => {
         if (pathname !== "/") return;
 
-        const sectionIds = ["home", "gallery", "about", "contact", "blog"];
+        const sectionIds = ["home", "about", "contact", "blog"];
         const sections = sectionIds.map((id) => document.getElementById(id));
 
         const observer = new IntersectionObserver(
@@ -141,18 +139,18 @@ export default function Navbar({ org }: { org: Audience }) {
     const currentBreadcrumb = pathname.startsWith("/blog")
         ? "Blog"
         : pathname.startsWith("/about")
-        ? "About"
-        : pathname.startsWith("/career")
-        ? "Career"
-        : pathname.startsWith("/services")
-        ? "Services"
-        : pathname.startsWith("/albums")
-        ? "Albums"
-        : pathname.startsWith("/gallery")
-        ? "Gallery"
-        : activeSection
-        ? activeSection.charAt(0).toUpperCase() + activeSection.slice(1)
-        : "Home";
+            ? "About"
+            : pathname.startsWith("/career")
+                ? "Career"
+                : pathname.startsWith("/services")
+                    ? "Services"
+                    : pathname.startsWith("/albums")
+                        ? "Albums"
+                        : pathname.startsWith("/gallery")
+                            ? "Gallery"
+                            : activeSection
+                                ? activeSection.charAt(0).toUpperCase() + activeSection.slice(1)
+                                : "Home";
 
     const renderDesktopNavLink = (item: NavItem) => {
         const isActive =
@@ -160,6 +158,7 @@ export default function Navbar({ org }: { org: Audience }) {
             (item.id === "blog" && pathname.startsWith("/blog")) ||
             (item.id === "career" && pathname.startsWith("/career")) ||
             (item.id === "services" && pathname.startsWith("/services")) ||
+            (item.id === "gallery" && pathname.startsWith("/gallery")) ||
             (item.id !== "switch" && pathname === "/" && activeSection === item.id);
 
         return (
@@ -167,19 +166,17 @@ export default function Navbar({ org }: { org: Audience }) {
                 key={item.id}
                 href={item.href}
                 onClick={(e) => handleNavClick(e, item)}
-                className={`relative group inline-flex items-center justify-center py-2 text-base font-light transition-colors ${
-                    isScrolled
-                        ? "text-zinc-700 hover:text-zinc-950"
-                        : isHome
+                className={`relative group inline-flex items-center justify-center py-2 text-base font-light transition-colors ${isScrolled
+                    ? "text-zinc-700 hover:text-zinc-950"
+                    : isHome
                         ? "text-zinc-100 hover:text-white"
                         : "text-zinc-800 hover:text-zinc-950"
-                }`}
+                    }`}
             >
                 {item.label.toUpperCase()}
                 <div
-                    className={`absolute -bottom-3 left-0 right-0 h-1 rounded-full bg-purple-600 transition-all duration-200 ${
-                        isActive ? "w-full opacity-100" : "w-0 opacity-0 group-hover:w-full group-hover:opacity-100"
-                    }`}
+                    className={`absolute -bottom-3 left-0 right-0 h-1 rounded-full bg-purple-600 transition-all duration-200 ${isActive ? "w-full opacity-100" : "w-0 opacity-0 group-hover:w-full group-hover:opacity-100"
+                        }`}
                 />
             </Link>
         );
@@ -187,26 +184,25 @@ export default function Navbar({ org }: { org: Audience }) {
 
     return (
         <header
-            className={`fixed top-0 left-0 right-0 z-50 px-4 sm:px-8 lg:px-12 py-4 lg:py-6 h-20 lg:h-24 flex items-center transition-all duration-300 ease-in-out ${
-                isScrolled || isMobileMenuOpen
-                    ? "bg-white/95 backdrop-blur-md border-b border-zinc-200/80 shadow-xs"
-                    : isHome
+            className={`fixed top-0 left-0 right-0 z-50 px-4 sm:px-8 lg:px-12 py-3 lg:py-4 h-28 lg:h-32 flex items-center transition-all duration-300 ease-in-out ${isScrolled || isMobileMenuOpen
+                ? "bg-white/95 backdrop-blur-md border-b border-zinc-200/80 shadow-xs"
+                : isHome
                     ? "bg-black/45 backdrop-blur-[2px] shadow-none"
                     : "bg-white border-b border-zinc-200/80 shadow-xs"
-            }`}
+                }`}
         >
             <div className="w-full max-w-7xl mx-auto flex items-center justify-between lg:justify-center">
 
                 {/* Mobile Breadcrumb Bar (Visible on < lg) */}
                 <div className="flex items-center gap-2 lg:hidden">
-                    <Link href="/" className="flex items-center gap-2 shrink-0">
+                    <Link href="/" className="flex items-center shrink-0">
                         <Image
                             src={logoSrc}
                             alt={logoAlt}
                             width={100}
-                            height={org === "kidography" ? 100 : 141}
+                            height={100}
                             priority
-                            className="h-10 w-auto object-contain"
+                            className="object-contain"
                         />
                     </Link>
 
@@ -223,11 +219,10 @@ export default function Navbar({ org }: { org: Audience }) {
                 <button
                     type="button"
                     onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-                    className={`lg:hidden p-2 rounded-lg transition-colors ${
-                        isScrolled || !isHome || isMobileMenuOpen
-                            ? "text-zinc-800 hover:bg-zinc-100"
-                            : "text-white hover:bg-white/10"
-                    }`}
+                    className={`lg:hidden p-2 rounded-lg transition-colors ${isScrolled || !isHome || isMobileMenuOpen
+                        ? "text-zinc-800 hover:bg-zinc-100"
+                        : "text-white hover:bg-white/10"
+                        }`}
                     aria-label="Toggle navigation menu"
                     aria-expanded={isMobileMenuOpen}
                 >
@@ -256,9 +251,9 @@ export default function Navbar({ org }: { org: Audience }) {
                             src={logoSrc}
                             alt={logoAlt}
                             width={100}
-                            height={org === "kidography" ? 100 : 141}
+                            height={100}
                             priority
-                            className="h-14 sm:h-16 w-auto object-contain transition-transform group-hover:scale-105"
+                            className="object-contain transition-transform"
                         />
                     </Link>
 
@@ -270,7 +265,7 @@ export default function Navbar({ org }: { org: Audience }) {
 
             {/* Mobile Dropdown Panel */}
             {isMobileMenuOpen && (
-                <div className="lg:hidden absolute top-20 left-0 right-0 bg-white border-b border-zinc-200 shadow-xl px-6 py-5 transition-all">
+                <div className="lg:hidden absolute top-28 left-0 right-0 bg-white border-b border-zinc-200 shadow-xl px-6 py-5 transition-all">
                     <div className="flex flex-col space-y-3">
                         {allMobileNavItems.map((item) => {
                             const isCurrent =
@@ -278,6 +273,7 @@ export default function Navbar({ org }: { org: Audience }) {
                                 (item.id === "blog" && pathname.startsWith("/blog")) ||
                                 (item.id === "career" && pathname.startsWith("/career")) ||
                                 (item.id === "services" && pathname.startsWith("/services")) ||
+                                (item.id === "gallery" && pathname.startsWith("/gallery")) ||
                                 (item.id !== "switch" && pathname === "/" && activeSection === item.id);
 
                             return (
@@ -285,11 +281,10 @@ export default function Navbar({ org }: { org: Audience }) {
                                     key={item.id}
                                     href={item.href}
                                     onClick={(e) => handleNavClick(e, item)}
-                                    className={`px-3 py-2 text-sm font-medium rounded-md transition-colors flex items-center justify-between ${
-                                        isCurrent
-                                            ? "bg-purple-50 text-purple-700 font-semibold"
-                                            : "text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900"
-                                    }`}
+                                    className={`px-3 py-2 text-sm font-medium rounded-md transition-colors flex items-center justify-between ${isCurrent
+                                        ? "bg-purple-50 text-purple-700 font-semibold"
+                                        : "text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900"
+                                        }`}
                                 >
                                     <span>{item.label}</span>
                                     {item.id === "switch" && (

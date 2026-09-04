@@ -37,6 +37,11 @@ export interface Album {
     name: string;
     slug: string;
     coverImage: string;
+    /** CSS `object-position` value, e.g. "50% 50%". */
+    coverPosition: string;
+    address: string;
+    venue: string;
+    category: string;
     images: AlbumImage[];
     createdAt: string;
 }

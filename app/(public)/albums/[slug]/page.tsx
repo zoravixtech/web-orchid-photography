@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import PageBanner from "@/components/PageBanner";
+import AlbumHero from "@/components/AlbumHero";
 import { getAlbumBySlug } from "@/lib/data/albums";
 
 export const revalidate = 86400;
@@ -12,13 +12,7 @@ export default async function AlbumDetailPage({ params }: { params: Promise<{ sl
 
     return (
         <div className="min-h-screen bg-white">
-            <PageBanner
-                eyebrow="The Orchid Photography"
-                title={album.name}
-                description={`${album.images.length} photo${album.images.length === 1 ? "" : "s"}`}
-                imageSrc={album.coverImage}
-                imageAlt={album.name}
-            />
+            <AlbumHero album={album} />
 
             <section className="py-16 sm:py-24 bg-white px-2 sm:px-3 md:px-4">
                 <div className="max-w-6xl mx-auto">

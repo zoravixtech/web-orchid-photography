@@ -7,7 +7,7 @@ export default async function BlogListingPage() {
     const posts = await getBlogs();
 
     return (
-        <div className="pt-24 pb-12">
+        <div className="pt-32 pb-12">
             <BlogsSection posts={posts} />
         </div>
     );

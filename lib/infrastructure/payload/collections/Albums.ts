@@ -26,6 +26,10 @@ export const Albums: CollectionConfig = {
         { name: "name", type: "text", required: true },
         { name: "slug", type: "text", unique: true, index: true },
         { name: "coverImage", type: "text", required: true },
+        { name: "coverPosition", type: "text", defaultValue: "50% 50%" },
+        { name: "address", type: "text", defaultValue: "" },
+        { name: "venue", type: "text", defaultValue: "" },
+        { name: "category", type: "text", defaultValue: "" },
         {
             name: "images",
             type: "array",

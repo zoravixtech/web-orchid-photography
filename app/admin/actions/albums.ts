@@ -28,15 +28,32 @@ function revalidateAlbumPaths(org: Org) {
     revalidatePath(`/admin/${org}/albums`);
 }
 
-export async function createAlbum(org: Org, name: string, coverImage: string): Promise<AlbumActionResult> {
+export interface CreateAlbumFields {
+    name: string;
+    coverImage: string;
+    coverPosition?: string;
+    address?: string;
+    venue?: string;
+    category?: string;
+}
+
+export async function createAlbum(org: Org, input: CreateAlbumFields): Promise<AlbumActionResult> {
     await requireAdmin();
-    if (!name.trim()) return { error: "Name is required." };
-    if (!coverImage) return { error: "Cover image is required." };
+    if (!input.name.trim()) return { error: "Name is required." };
+    if (!input.coverImage) return { error: "Cover image is required." };
 
     const repo = getAlbumRepository();
     if (!repo) return { error: "Database is not configured." };
 
-    const album = await repo.create({ org, name: name.trim(), coverImage });
+    const album = await repo.create({
+        org,
+        name: input.name.trim(),
+        coverImage: input.coverImage,
+        coverPosition: input.coverPosition,
+        address: input.address,
+        venue: input.venue,
+        category: input.category,
+    });
     updateTag(ALBUMS_TAG);
     revalidateAlbumPaths(org);
 
@@ -46,7 +63,7 @@ export async function createAlbum(org: Org, name: string, coverImage: string): P
 export async function updateAlbum(
     id: string,
     org: Org,
-    input: { name?: string; coverImage?: string }
+    input: { name?: string; coverImage?: string; coverPosition?: string; address?: string; venue?: string; category?: string }
 ): Promise<AlbumActionResult> {
     await requireAdmin();
 

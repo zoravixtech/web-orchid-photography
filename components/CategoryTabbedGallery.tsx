@@ -4,7 +4,8 @@ import type { Category, GalleryMediaItem } from "@/lib/types";
 
 interface CategoryTabbedGalleryProps {
     categories: Category[];
-    activeCategoryId: string | null;
+    /** A real category id, or "all" for the unfiltered feed. */
+    activeCategoryId: string;
     images: GalleryMediaItem[];
     basePath: string;
 }
@@ -22,6 +23,16 @@ export default function CategoryTabbedGallery({ categories, activeCategoryId, im
         <section className="py-16 sm:py-24 bg-white px-2 sm:px-3 md:px-4">
             <div className="max-w-6xl mx-auto">
                 <div className="flex flex-wrap justify-center gap-2 mb-10">
+                    <Link
+                        href={basePath}
+                        className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors border ${
+                            activeCategoryId === "all"
+                                ? "bg-purple-600 text-white border-purple-600"
+                                : "bg-white text-slate-600 border-slate-300 hover:bg-slate-50"
+                        }`}
+                    >
+                        All
+                    </Link>
                     {categories.map((category) => (
                         <Link
                             key={category.id}
@@ -38,7 +49,9 @@ export default function CategoryTabbedGallery({ categories, activeCategoryId, im
                 </div>
 
                 {images.length === 0 ? (
-                    <p className="text-center text-slate-500">No images in this category yet.</p>
+                    <p className="text-center text-slate-500">
+                        {activeCategoryId === "all" ? "No images published yet." : "No images in this category yet."}
+                    </p>
                 ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         {images.map((image) => (

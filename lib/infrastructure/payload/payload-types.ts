@@ -192,6 +192,10 @@ export interface Album {
   name: string;
   slug?: string | null;
   coverImage: string;
+  coverPosition?: string | null;
+  address?: string | null;
+  venue?: string | null;
+  category?: string | null;
   images?:
     | {
         url: string;
@@ -393,6 +397,10 @@ export interface AlbumsSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
   coverImage?: T;
+  coverPosition?: T;
+  address?: T;
+  venue?: T;
+  category?: T;
   images?:
     | T
     | {

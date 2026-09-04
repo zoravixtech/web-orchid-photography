@@ -8,8 +8,13 @@ export const revalidate = 86400;
 export default async function KidographyGalleryPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
     const { category } = await searchParams;
     const categories = await getCategories("kidography");
-    const activeCategoryId = category && categories.some((c) => c.id === category) ? category : categories[0]?.id;
-    const images = activeCategoryId ? await getGalleryMedia("kidography", activeCategoryId) : [];
+    const activeCategoryId = category && categories.some((c) => c.id === category) ? category : "all";
+    const images =
+        categories.length === 0
+            ? []
+            : activeCategoryId === "all"
+            ? await getGalleryMedia("kidography")
+            : await getGalleryMedia("kidography", activeCategoryId);
 
     return (
         <div className="min-h-screen bg-white">
@@ -25,7 +30,7 @@ export default async function KidographyGalleryPage({ searchParams }: { searchPa
 
             <CategoryTabbedGallery
                 categories={categories}
-                activeCategoryId={activeCategoryId ?? null}
+                activeCategoryId={activeCategoryId}
                 images={images}
                 basePath="/kidography/gallery"
             />

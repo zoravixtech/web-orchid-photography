@@ -78,7 +78,13 @@ export default function AlbumTable({ org, initialAlbums }: { org: Org; initialAl
                                 <tr key={album.id}>
                                     <td className="px-4 py-3">
                                         <div className="relative w-14 h-10 rounded-md overflow-hidden bg-slate-100">
-                                            <Image src={album.coverImage} alt={album.name} fill className="object-cover" />
+                                            <Image
+                                                src={album.coverImage}
+                                                alt={album.name}
+                                                fill
+                                                className="object-cover"
+                                                style={{ objectPosition: album.coverPosition || "50% 50%" }}
+                                            />
                                         </div>
                                     </td>
                                     <td className="px-4 py-3 text-slate-800 font-medium whitespace-nowrap">{album.name}</td>

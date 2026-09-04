@@ -33,7 +33,8 @@ export default function AlbumsGridSection({
                                     src={album.coverImage}
                                     alt={album.name}
                                     fill
-                                    className="object-cover object-center rounded-none transition-transform duration-500 group-hover:scale-105"
+                                    className="object-cover rounded-none transition-transform duration-500 group-hover:scale-105"
+                                    style={{ objectPosition: album.coverPosition || "50% 50%" }}
                                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                 />
                             </div>

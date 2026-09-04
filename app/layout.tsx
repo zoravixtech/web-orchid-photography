@@ -1,9 +1,17 @@
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
+import { Montserrat, Berkshire_Swash } from "next/font/google";
 import "./globals.css";
 
 const montserrat = Montserrat({
     variable: "--font-montserrat",
+    subsets: ["latin"],
+    display: "swap",
+});
+
+// Decorative cursive face used only for the album hero's couple/event title.
+const albumTitleFont = Berkshire_Swash({
+    variable: "--font-album-title",
+    weight: "400",
     subsets: ["latin"],
     display: "swap",
 });
@@ -131,7 +139,7 @@ export default function RootLayout({
         <html
             lang="en"
             data-scroll-behavior="smooth"
-            className={`${montserrat.variable} h-full antialiased scroll-smooth`}
+            className={`${montserrat.variable} ${albumTitleFont.variable} h-full antialiased scroll-smooth`}
             suppressHydrationWarning
         >
             <head>

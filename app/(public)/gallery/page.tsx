@@ -8,8 +8,13 @@ export const revalidate = 86400;
 export default async function GalleryPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
     const { category } = await searchParams;
     const categories = await getCategories("orchid");
-    const activeCategoryId = category && categories.some((c) => c.id === category) ? category : categories[0]?.id;
-    const images = activeCategoryId ? await getGalleryMedia("orchid", activeCategoryId) : [];
+    const activeCategoryId = category && categories.some((c) => c.id === category) ? category : "all";
+    const images =
+        categories.length === 0
+            ? []
+            : activeCategoryId === "all"
+            ? await getGalleryMedia("orchid")
+            : await getGalleryMedia("orchid", activeCategoryId);
 
     return (
         <div className="min-h-screen bg-white">
@@ -25,7 +30,7 @@ export default async function GalleryPage({ searchParams }: { searchParams: Prom
 
             <CategoryTabbedGallery
                 categories={categories}
-                activeCategoryId={activeCategoryId ?? null}
+                activeCategoryId={activeCategoryId}
                 images={images}
                 basePath="/gallery"
             />
