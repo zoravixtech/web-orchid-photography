@@ -13,7 +13,7 @@ const DEFAULT_IMAGE =
 
 export default function PageBanner({ eyebrow, title, description, imageSrc = DEFAULT_IMAGE, imageAlt }: PageBannerProps) {
     return (
-        <div className="relative py-24 sm:py-32 mt-32 bg-slate-950 text-white overflow-hidden">
+        <div className="relative py-24 sm:py-32 mt-28 bg-slate-950 text-white overflow-hidden">
             <Image
                 src={imageSrc}
                 alt={imageAlt}

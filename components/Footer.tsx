@@ -4,7 +4,9 @@ import type { Audience } from '@/lib/config/domain'
 import type { SocialLinks } from '@/lib/types'
 
 // Hardcoded per-org logo assets (task: logo is no longer admin-editable).
-const ORCHID_LOGO = '/orchid-logo.png'
+// The footer background is always dark, so Orchid always uses its
+// light-text logo variant here.
+const ORCHID_LOGO_DARK_BG = '/orchid-logo-2.png'
 const KIDOGRAPHY_LOGO = '/kidography-logo.png'
 
 export default function Footer({
@@ -14,7 +16,7 @@ export default function Footer({
   org: Audience
   socialLinks: SocialLinks
 }) {
-  const logoSrc = org === 'kidography' ? KIDOGRAPHY_LOGO : ORCHID_LOGO
+  const logoSrc = org === 'kidography' ? KIDOGRAPHY_LOGO : ORCHID_LOGO_DARK_BG
   const logoAlt = org === 'kidography' ? 'The Orchid Kidography Logo' : 'The Orchid Photography Logo'
 
   return (
@@ -34,7 +36,7 @@ export default function Footer({
                   alt={logoAlt}
                   width={100}
                   height={org === 'kidography' ? 100 : 141}
-                  className="h-36 w-auto object-contain transition-transform group-hover:scale-105"
+                  className="h-24 w-auto object-contain transition-transform group-hover:scale-105"
                 />
               </Link>
             </div>

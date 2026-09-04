@@ -38,7 +38,7 @@ export default function AlbumHero({ album }: AlbumHeroProps) {
 
     return (
         <div className="bg-white">
-            <div className="relative w-full h-[52vh] sm:h-[64vh] lg:h-[80vh] mt-28 lg:mt-32 bg-slate-950">
+            <div className="relative w-full h-[52vh] sm:h-[64vh] lg:h-[80vh] mt-24 lg:mt-28 bg-slate-950">
                 <Image
                     src={album.coverImage}
                     alt={album.name}

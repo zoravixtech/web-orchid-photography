@@ -14,7 +14,7 @@ export default function AboutPage() {
     return (
         <div className="min-h-screen bg-white">
             {/* Top Hero Breadcrumb Banner */}
-            <div className="relative py-24 sm:py-32 mt-32 bg-slate-950 text-white overflow-hidden">
+            <div className="relative py-24 sm:py-32 mt-28 bg-slate-950 text-white overflow-hidden">
                 {/* Background Cover Image */}
                 <Image
                     src="https://images.prismic.io/chobirkotha2/ZwwH8oF3NbkBXXt5_ARG_9438.jpg?auto=format,compress&rect=0,0,6017,4011&w=1920&h=1080"

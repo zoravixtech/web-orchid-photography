@@ -7,7 +7,10 @@ import { usePathname } from "next/navigation";
 import { getAudienceFromHostname, getKidographyDomain, getWeddingDomain, type Audience } from "@/lib/config/domain";
 
 // Hardcoded per-org logo assets (task: logo is no longer admin-editable).
+// Orchid has a light-text variant for the transparent/dark-overlay navbar
+// state; Kidography only has the one mark, used everywhere.
 const ORCHID_LOGO = "/orchid-logo.png";
+const ORCHID_LOGO_DARK_BG = "/orchid-logo-2.png";
 const KIDOGRAPHY_LOGO = "/kidography-logo.png";
 
 const noopSubscribe = () => () => { };
@@ -56,7 +59,13 @@ export default function Navbar({ org }: { org: Audience }) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const pathname = usePathname();
 
-    const logoSrc = org === "kidography" ? KIDOGRAPHY_LOGO : ORCHID_LOGO;
+    const isHome = pathname === "/";
+    // Matches the header's own bg-black/45 state below: transparent-over-hero,
+    // only at the very top of the homepage.
+    const isDarkBackground = isHome && !isScrolled && !isMobileMenuOpen;
+
+    const logoSrc =
+        org === "kidography" ? KIDOGRAPHY_LOGO : isDarkBackground ? ORCHID_LOGO_DARK_BG : ORCHID_LOGO;
     const logoAlt = org === "kidography" ? "The Orchid Kidography Logo" : "The Orchid Photography Logo";
 
     const audience = useSyncExternalStore(noopSubscribe, getClientAudience, getServerAudience);
@@ -133,8 +142,6 @@ export default function Navbar({ org }: { org: Audience }) {
         }
     };
 
-    const isHome = pathname === "/";
-
     // Determine current breadcrumb label for mobile
     const currentBreadcrumb = pathname.startsWith("/blog")
         ? "Blog"
@@ -184,7 +191,7 @@ export default function Navbar({ org }: { org: Audience }) {
 
     return (
         <header
-            className={`fixed top-0 left-0 right-0 z-50 px-4 sm:px-8 lg:px-12 py-3 lg:py-4 h-28 lg:h-32 flex items-center transition-all duration-300 ease-in-out ${isScrolled || isMobileMenuOpen
+            className={`fixed top-0 left-0 right-0 z-50 px-4 sm:px-8 lg:px-12 py-3 lg:py-4 h-24 lg:h-28 flex items-center transition-all duration-300 ease-in-out ${isScrolled || isMobileMenuOpen
                 ? "bg-white/95 backdrop-blur-md border-b border-zinc-200/80 shadow-xs"
                 : isHome
                     ? "bg-black/45 backdrop-blur-[2px] shadow-none"
@@ -202,7 +209,7 @@ export default function Navbar({ org }: { org: Audience }) {
                             width={100}
                             height={100}
                             priority
-                            className="object-contain"
+                            className="h-14 w-auto object-contain"
                         />
                     </Link>
 
@@ -253,7 +260,7 @@ export default function Navbar({ org }: { org: Audience }) {
                             width={100}
                             height={100}
                             priority
-                            className="object-contain transition-transform"
+                            className="h-20 w-auto object-contain transition-transform group-hover:scale-105"
                         />
                     </Link>
 
@@ -265,7 +272,7 @@ export default function Navbar({ org }: { org: Audience }) {
 
             {/* Mobile Dropdown Panel */}
             {isMobileMenuOpen && (
-                <div className="lg:hidden absolute top-28 left-0 right-0 bg-white border-b border-zinc-200 shadow-xl px-6 py-5 transition-all">
+                <div className="lg:hidden absolute top-24 left-0 right-0 bg-white border-b border-zinc-200 shadow-xl px-6 py-5 transition-all">
                     <div className="flex flex-col space-y-3">
                         {allMobileNavItems.map((item) => {
                             const isCurrent =

@@ -88,7 +88,7 @@ export default async function BlogDetailPage({
         .slice(0, 3);
 
     return (
-        <div className="pt-32 pb-16">
+        <div className="pt-28 pb-16">
             <main className="max-w-4xl mx-auto px-6 py-8">
                 {/* Breadcrumb Navigation */}
                 <div className="flex items-center gap-2 text-xs text-zinc-400 mb-6">
