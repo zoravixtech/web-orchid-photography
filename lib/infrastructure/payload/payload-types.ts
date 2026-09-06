@@ -74,6 +74,7 @@ export interface Config {
     'gallery-media': GalleryMedia;
     'hero-carousel': HeroCarousel;
     reviews: Review;
+    films: Film;
     'payload-kv': PayloadKv;
     users: User;
     'payload-locked-documents': PayloadLockedDocument;
@@ -251,6 +252,19 @@ export interface Review {
   videoUrl?: string | null;
   videoStoragePath?: string | null;
   pinned?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "films".
+ */
+export interface Film {
+  id: number;
+  title: string;
+  youtubeUrl: string;
+  videoId: string;
+  thumbnailUrl: string;
   updatedAt: string;
   createdAt: string;
 }

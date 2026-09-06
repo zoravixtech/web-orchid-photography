@@ -44,14 +44,15 @@ const leftNavItems: NavItem[] = [
     { id: "home", label: "Home", href: "/" },
     { id: "gallery", label: "Gallery", href: "/gallery" },
     { id: "services", label: "Services", href: "/services" },
-    { id: "reviews", label: "Reviews", href: "/reviews" },
+    { id: "films", label: "Films", href: "/films" },
 ];
 
 const rightNavItems: NavItem[] = [
     { id: "about", label: "About Us", href: "/about" },
-    { id: "contact", label: "Contact", href: "/#contact" },
     { id: "career", label: "Career", href: "/career" },
     { id: "blog", label: "Blog", href: "/blog" },
+    { id: "reviews", label: "Reviews", href: "/reviews" },
+    { id: "contact", label: "Contact", href: "/#contact" },
 ];
 
 export default function Navbar({ org }: { org: Audience }) {
@@ -152,13 +153,17 @@ export default function Navbar({ org }: { org: Audience }) {
                 ? "Career"
                 : pathname.startsWith("/services")
                     ? "Services"
-                    : pathname.startsWith("/albums")
-                        ? "Albums"
-                        : pathname.startsWith("/gallery")
-                            ? "Gallery"
-                            : activeSection
-                                ? activeSection.charAt(0).toUpperCase() + activeSection.slice(1)
-                                : "Home";
+                    : pathname.startsWith("/films")
+                        ? "Films"
+                        : pathname.startsWith("/reviews")
+                            ? "Reviews"
+                            : pathname.startsWith("/albums")
+                                ? "Albums"
+                                : pathname.startsWith("/gallery")
+                                    ? "Gallery"
+                                    : activeSection
+                                        ? activeSection.charAt(0).toUpperCase() + activeSection.slice(1)
+                                        : "Home";
 
     const renderDesktopNavLink = (item: NavItem) => {
         const isActive =
@@ -166,6 +171,8 @@ export default function Navbar({ org }: { org: Audience }) {
             (item.id === "blog" && pathname.startsWith("/blog")) ||
             (item.id === "career" && pathname.startsWith("/career")) ||
             (item.id === "services" && pathname.startsWith("/services")) ||
+            (item.id === "films" && pathname.startsWith("/films")) ||
+            (item.id === "reviews" && pathname.startsWith("/reviews")) ||
             (item.id === "gallery" && pathname.startsWith("/gallery")) ||
             (item.id !== "switch" && pathname === "/" && activeSection === item.id);
 
@@ -281,6 +288,8 @@ export default function Navbar({ org }: { org: Audience }) {
                                 (item.id === "blog" && pathname.startsWith("/blog")) ||
                                 (item.id === "career" && pathname.startsWith("/career")) ||
                                 (item.id === "services" && pathname.startsWith("/services")) ||
+                                (item.id === "films" && pathname.startsWith("/films")) ||
+                                (item.id === "reviews" && pathname.startsWith("/reviews")) ||
                                 (item.id === "gallery" && pathname.startsWith("/gallery")) ||
                                 (item.id !== "switch" && pathname === "/" && activeSection === item.id);
 

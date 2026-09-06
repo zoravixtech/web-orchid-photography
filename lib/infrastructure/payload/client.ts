@@ -15,7 +15,10 @@ export function getPayloadClient(): Promise<Payload> | null {
     if (!env.DATABASE_URL || !env.PAYLOAD_SECRET) return null;
 
     if (!globalThis.__payloadClientPromise) {
-        globalThis.__payloadClientPromise = getPayload({ config });
+        globalThis.__payloadClientPromise = getPayload({ config }).catch((err) => {
+            delete globalThis.__payloadClientPromise;
+            throw err;
+        });
     }
     return globalThis.__payloadClientPromise;
 }

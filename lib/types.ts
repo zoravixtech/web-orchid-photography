@@ -121,3 +121,12 @@ export interface Review {
     pinned: boolean;
     createdAt: string;
 }
+
+export interface Film {
+    id: string;
+    title: string;
+    youtubeUrl: string;
+    videoId: string;
+    thumbnailUrl: string;
+    createdAt: string;
+}

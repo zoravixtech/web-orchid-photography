@@ -166,6 +166,76 @@ async function main() {
         created += 1;
     }
     console.log(`Seeded ${created} blog post(s) (${blogs.length - created} already existed).`);
+
+    const { totalDocs: filmCount } = await payload.count({ collection: "films" });
+    if (filmCount === 0) {
+        const initialFilms = [
+            {
+                title: "The Royal Marwari Full Wedding Film || KOLKATA",
+                youtubeUrl: "https://www.youtube.com/watch?v=dK7miuzlq7w",
+                videoId: "dK7miuzlq7w",
+                thumbnailUrl: "https://i.ytimg.com/vi/dK7miuzlq7w/hqdefault.jpg",
+            },
+            {
+                title: "Marwari Wedding Highlights",
+                youtubeUrl: "https://www.youtube.com/watch?v=pYJJeiWqp5E",
+                videoId: "pYJJeiWqp5E",
+                thumbnailUrl: "https://i.ytimg.com/vi/pYJJeiWqp5E/hqdefault.jpg",
+            },
+            {
+                title: "Harshit & Priyanka Wedding Film",
+                youtubeUrl: "https://www.youtube.com/watch?v=5ZNKiqMTI9s",
+                videoId: "5ZNKiqMTI9s",
+                thumbnailUrl: "https://i.ytimg.com/vi/5ZNKiqMTI9s/hqdefault.jpg",
+            },
+            {
+                title: "Grand Marwari Wedding Cinematography",
+                youtubeUrl: "https://www.youtube.com/watch?v=qDQp2TxEStw",
+                videoId: "qDQp2TxEStw",
+                thumbnailUrl: "https://i.ytimg.com/vi/qDQp2TxEStw/hqdefault.jpg",
+            },
+            {
+                title: "Siddhant Wedding Teaser",
+                youtubeUrl: "https://www.youtube.com/watch?v=zx0JqOAfUso",
+                videoId: "zx0JqOAfUso",
+                thumbnailUrl: "https://i.ytimg.com/vi/zx0JqOAfUso/hqdefault.jpg",
+            },
+            {
+                title: "Traditional Marwari Wedding Rituals",
+                youtubeUrl: "https://www.youtube.com/watch?v=tJ1-Coa-cJw",
+                videoId: "tJ1-Coa-cJw",
+                thumbnailUrl: "https://i.ytimg.com/vi/tJ1-Coa-cJw/hqdefault.jpg",
+            },
+            {
+                title: "Royal Indian Wedding Teaser",
+                youtubeUrl: "https://www.youtube.com/watch?v=oGEeKoTwNd4",
+                videoId: "oGEeKoTwNd4",
+                thumbnailUrl: "https://i.ytimg.com/vi/oGEeKoTwNd4/hqdefault.jpg",
+            },
+            {
+                title: "Kolkata Luxury Wedding Film",
+                youtubeUrl: "https://www.youtube.com/watch?v=zUxUaSmcb9Q",
+                videoId: "zUxUaSmcb9Q",
+                thumbnailUrl: "https://i.ytimg.com/vi/zUxUaSmcb9Q/hqdefault.jpg",
+            },
+            {
+                title: "Emotional Marwari Bidaai & Reception",
+                youtubeUrl: "https://www.youtube.com/watch?v=9bTFs11JKII",
+                videoId: "9bTFs11JKII",
+                thumbnailUrl: "https://i.ytimg.com/vi/9bTFs11JKII/hqdefault.jpg",
+            },
+        ];
+
+        for (const film of initialFilms) {
+            await payload.create({
+                collection: "films",
+                data: film,
+            });
+        }
+        console.log(`Seeded ${initialFilms.length} wedding films.`);
+    } else {
+        console.log(`Skipping films seed: ${filmCount} film(s) already exist.`);
+    }
 }
 
 // Top-level await so `payload run` (which resolves as soon as this module's

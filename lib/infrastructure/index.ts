@@ -7,6 +7,7 @@ import { PayloadCareerRepository } from "@/lib/infrastructure/payload/careerRepo
 import { PayloadCategoryRepository } from "@/lib/infrastructure/payload/categoryRepository";
 import { PayloadAlbumRepository } from "@/lib/infrastructure/payload/albumRepository";
 import { PayloadReviewRepository } from "@/lib/infrastructure/payload/reviewRepository";
+import { PayloadFilmRepository } from "@/lib/infrastructure/payload/filmRepository";
 import { getS3Client } from "@/lib/infrastructure/s3/client";
 import { S3MediaStorage } from "@/lib/infrastructure/s3/mediaStorage";
 import { env } from "@/lib/config/env";
@@ -18,6 +19,7 @@ import type { CareerRepository } from "@/lib/repositories/careerRepository";
 import type { CategoryRepository } from "@/lib/repositories/categoryRepository";
 import type { AlbumRepository } from "@/lib/repositories/albumRepository";
 import type { ReviewRepository } from "@/lib/repositories/reviewRepository";
+import type { FilmRepository } from "@/lib/repositories/filmRepository";
 import type { MediaStorage } from "@/lib/storage/mediaStorage";
 
 export function getSettingsRepository(): SettingsRepository | null {
@@ -58,6 +60,11 @@ export function getAlbumRepository(): AlbumRepository | null {
 export function getReviewRepository(): ReviewRepository | null {
     const payload = getPayloadClient();
     return payload ? new PayloadReviewRepository(payload) : null;
+}
+
+export function getFilmRepository(): FilmRepository | null {
+    const payload = getPayloadClient();
+    return payload ? new PayloadFilmRepository(payload) : null;
 }
 
 export function getMediaStorage(): MediaStorage | null {

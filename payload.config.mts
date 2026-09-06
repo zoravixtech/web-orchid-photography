@@ -7,6 +7,7 @@ import { Albums } from "./lib/infrastructure/payload/collections/Albums.ts";
 import { GalleryMedia } from "./lib/infrastructure/payload/collections/GalleryMedia.ts";
 import { HeroCarousel } from "./lib/infrastructure/payload/collections/HeroCarousel.ts";
 import { Reviews } from "./lib/infrastructure/payload/collections/Reviews.ts";
+import { Films } from "./lib/infrastructure/payload/collections/Films.ts";
 import { SiteSettingsOrchid, SiteSettingsKidography, SiteSettingsLegacy } from "./lib/infrastructure/payload/globals/SiteSettings.ts";
 
 /**
@@ -26,8 +27,9 @@ export default buildConfig({
         // otherwise pulls in Next's env-loading code — irrelevant here since we
         // rely on dev-mode schema push, not the migration CLI).
         migrationDir: "migrations",
+        push: process.env.PAYLOAD_PUSH === "true" || process.env.npm_lifecycle_event === "seed",
     }),
-    collections: [Blogs, Careers, Categories, Albums, GalleryMedia, HeroCarousel, Reviews],
+    collections: [Blogs, Careers, Categories, Albums, GalleryMedia, HeroCarousel, Reviews, Films],
     globals: [SiteSettingsOrchid, SiteSettingsKidography, SiteSettingsLegacy],
     typescript: {
         outputFile: "lib/infrastructure/payload/payload-types.ts",
