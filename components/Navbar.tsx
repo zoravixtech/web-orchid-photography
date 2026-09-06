@@ -44,6 +44,7 @@ const leftNavItems: NavItem[] = [
     { id: "home", label: "Home", href: "/" },
     { id: "gallery", label: "Gallery", href: "/gallery" },
     { id: "services", label: "Services", href: "/services" },
+    { id: "reviews", label: "Reviews", href: "/reviews" },
 ];
 
 const rightNavItems: NavItem[] = [

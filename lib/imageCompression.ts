@@ -4,13 +4,13 @@
  */
 export async function compressImageFile(
     file: File,
-    kind: "logo" | "photo" = "photo"
+    kind: "logo" | "photo" | "avatar" = "photo"
 ): Promise<File> {
     // Skip vector graphics and animated GIFs
     if (file.type === "image/svg+xml" || file.type === "image/gif") return file;
 
-    const maxDimension = kind === "logo" ? 800 : 1920;
-    const quality = 0.82;
+    const maxDimension = kind === "avatar" ? 150 : kind === "logo" ? 800 : 1920;
+    const quality = kind === "avatar" ? 0.75 : 0.82;
     const targetMime = kind === "logo" ? "image/png" : "image/webp";
 
     // Read dimensions natively without full decoding
@@ -19,8 +19,8 @@ export async function compressImageFile(
     tempBitmap.close(); // Immediately release RAM
 
     // If image is already smaller than maxDimension and < 500KB, skip re-encoding for photos.
-    // For logos, we might still want to ensure it's a PNG, but usually if it's small, it's fine.
-    if (width <= maxDimension && height <= maxDimension && file.size < 500_000 && (kind !== "logo" || file.type === "image/png")) {
+    // For logos and avatars, we always re-encode to ensure minimal size and proper format.
+    if (kind === "photo" && width <= maxDimension && height <= maxDimension && file.size < 500_000) {
         return file;
     }
 

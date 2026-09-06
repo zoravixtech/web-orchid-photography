@@ -51,7 +51,7 @@ export async function uploadFile(
 
     const optimized = isVideoKind(kind)
         ? await compressVideoFile(file, reportCompress)
-        : await compressImageFile(file, "photo");
+        : await compressImageFile(file, kind === "reviewAvatar" ? "avatar" : "photo");
 
     const presign = await createUploadUrl({
         kind,

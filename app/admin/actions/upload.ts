@@ -66,7 +66,16 @@ export async function createUploadUrl(
     const storage = getMediaStorage();
     if (!storage) return { error: "Storage is not configured." };
 
-    const folder = isVideo ? "settings/videos" : input.kind === "blog" ? "blogs" : input.kind;
+    const folder =
+        input.kind === "reviewAvatar"
+            ? "reviews/avatars"
+            : input.kind === "reviewVideo"
+            ? "reviews/videos"
+            : isVideo
+            ? "settings/videos"
+            : input.kind === "blog"
+            ? "blogs"
+            : input.kind;
     const ext = extensionFromName(input.fileName, isVideo ? ".mp4" : ".jpg");
     const key = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 10)}${ext}`;
 

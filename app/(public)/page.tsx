@@ -9,17 +9,19 @@ import BlogsSection from "@/components/BlogsSection";
 import { getSiteSettings, getPinnedMedia, getHeroCarouselMedia } from "@/lib/data/settings";
 import { getAlbums } from "@/lib/data/albums";
 import { getBlogs } from "@/lib/data/blogs";
+import { getPinnedReviews } from "@/lib/data/reviews";
 
 // Serve cached HTML for a long time; content is invalidated on-demand from the admin panel.
 export const revalidate = 86400;
 
 export default async function Home() {
-    const [settings, albums, pinnedImages, heroImages, blogPosts] = await Promise.all([
+    const [settings, albums, pinnedImages, heroImages, blogPosts, pinnedReviews] = await Promise.all([
         getSiteSettings("orchid"),
         getAlbums("orchid"),
         getPinnedMedia("orchid"),
         getHeroCarouselMedia("orchid"),
         getBlogs(),
+        getPinnedReviews(),
     ]);
 
     return (
@@ -43,7 +45,7 @@ export default async function Home() {
             <StatsCounterSection stats={settings.stats} />
 
             {/* Client Testimonials Section */}
-            <TestimonialsSection />
+            <TestimonialsSection pinnedReviews={pinnedReviews} />
 
             {/* Blogs Section */}
             <BlogsSection posts={blogPosts} />

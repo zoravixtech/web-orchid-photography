@@ -5,8 +5,9 @@ import {
     getCareerRepository,
     getCategoryRepository,
     getAlbumRepository,
+    getReviewRepository,
 } from "@/lib/infrastructure";
-import type { Album, BlogPost, CareerPost, Category, GalleryMediaItem, Org } from "@/lib/types";
+import type { Album, BlogPost, CareerPost, Category, GalleryMediaItem, Org, Review } from "@/lib/types";
 
 // Uncached, fresh reads used by the admin panel (which always renders dynamically).
 
@@ -70,6 +71,18 @@ export async function listCareersForAdmin(): Promise<CareerPost[]> {
 
 export async function getCareerByIdForAdmin(id: string): Promise<CareerPost | null> {
     const repo = getCareerRepository();
+    if (!repo) return null;
+    return repo.findById(id);
+}
+
+export async function listReviewsForAdmin(): Promise<Review[]> {
+    const repo = getReviewRepository();
+    if (!repo) return [];
+    return repo.list();
+}
+
+export async function getReviewByIdForAdmin(id: string): Promise<Review | null> {
+    const repo = getReviewRepository();
     if (!repo) return null;
     return repo.findById(id);
 }

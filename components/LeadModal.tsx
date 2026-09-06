@@ -43,7 +43,7 @@ export default function LeadModal() {
     useEffect(() => {
         const alreadySubmitted = localStorage.getItem(LOCAL_STORAGE_KEY) === 'true'
         if (alreadySubmitted) {
-            setIsSubmitted(true)
+            queueMicrotask(() => setIsSubmitted(true))
             return
         }
 

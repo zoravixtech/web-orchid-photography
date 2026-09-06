@@ -73,6 +73,7 @@ export interface Config {
     albums: Album;
     'gallery-media': GalleryMedia;
     'hero-carousel': HeroCarousel;
+    reviews: Review;
     'payload-kv': PayloadKv;
     users: User;
     'payload-locked-documents': PayloadLockedDocument;
@@ -87,6 +88,7 @@ export interface Config {
     albums: AlbumsSelect<false> | AlbumsSelect<true>;
     'gallery-media': GalleryMediaSelect<false> | GalleryMediaSelect<true>;
     'hero-carousel': HeroCarouselSelect<false> | HeroCarouselSelect<true>;
+    reviews: ReviewsSelect<false> | ReviewsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -235,6 +237,25 @@ export interface HeroCarousel {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews".
+ */
+export interface Review {
+  id: number;
+  type: 'text' | 'video';
+  name: string;
+  stars: number;
+  userImage?: string | null;
+  userImageStoragePath?: string | null;
+  message?: string | null;
+  platform?: ('google' | 'facebook' | 'wedmegood') | null;
+  videoUrl?: string | null;
+  videoStoragePath?: string | null;
+  pinned?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -305,6 +326,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'hero-carousel';
         value: number | HeroCarousel;
+      } | null)
+    | ({
+        relationTo: 'reviews';
+        value: number | Review;
       } | null)
     | ({
         relationTo: 'users';
@@ -433,6 +458,24 @@ export interface GalleryMediaSelect<T extends boolean = true> {
  */
 export interface HeroCarouselSelect<T extends boolean = true> {
   media?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews_select".
+ */
+export interface ReviewsSelect<T extends boolean = true> {
+  type?: T;
+  name?: T;
+  stars?: T;
+  userImage?: T;
+  userImageStoragePath?: T;
+  message?: T;
+  platform?: T;
+  videoUrl?: T;
+  videoStoragePath?: T;
+  pinned?: T;
   updatedAt?: T;
   createdAt?: T;
 }

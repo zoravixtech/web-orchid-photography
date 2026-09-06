@@ -9,6 +9,7 @@ import BlogsSection from "@/components/BlogsSection";
 import { getSiteSettings, getPinnedMedia, getHeroCarouselMedia } from "@/lib/data/settings";
 import { getAlbums } from "@/lib/data/albums";
 import { getBlogs } from "@/lib/data/blogs";
+import { getPinnedReviews } from "@/lib/data/reviews";
 
 // This is the kidography home page — served at "/" on the kidography
 // subdomain via a proxy rewrite (see proxy.ts), and also directly reachable
@@ -18,12 +19,13 @@ import { getBlogs } from "@/lib/data/blogs";
 export const revalidate = 86400;
 
 export default async function KidographyPage() {
-    const [settings, albums, pinnedImages, heroImages, blogPosts] = await Promise.all([
+    const [settings, albums, pinnedImages, heroImages, blogPosts, pinnedReviews] = await Promise.all([
         getSiteSettings("kidography"),
         getAlbums("kidography"),
         getPinnedMedia("kidography"),
         getHeroCarouselMedia("kidography"),
         getBlogs(),
+        getPinnedReviews(),
     ]);
 
     return (
@@ -57,7 +59,7 @@ export default async function KidographyPage() {
             <StatsCounterSection stats={settings.stats} />
 
             {/* Client Testimonials Section */}
-            <TestimonialsSection />
+            <TestimonialsSection pinnedReviews={pinnedReviews} />
 
             {/* Blogs Section */}
             <BlogsSection posts={blogPosts} />

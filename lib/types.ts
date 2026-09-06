@@ -103,3 +103,21 @@ export function formatBlogDate(isoDate: string): string {
     if (Number.isNaN(date.getTime())) return isoDate;
     return date.toLocaleDateString("en-GB", BLOG_DATE_FORMAT);
 }
+
+export type ReviewType = "text" | "video";
+export type ReviewPlatform = "facebook" | "google" | "wedmegood";
+
+export interface Review {
+    id: string;
+    type: ReviewType;
+    name: string;
+    stars: number;
+    userImage?: string | null;
+    userImageStoragePath?: string | null;
+    message?: string | null;
+    platform?: ReviewPlatform | null;
+    videoUrl?: string | null;
+    videoStoragePath?: string | null;
+    pinned: boolean;
+    createdAt: string;
+}

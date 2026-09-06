@@ -6,6 +6,7 @@ import { Categories } from "./lib/infrastructure/payload/collections/Categories.
 import { Albums } from "./lib/infrastructure/payload/collections/Albums.ts";
 import { GalleryMedia } from "./lib/infrastructure/payload/collections/GalleryMedia.ts";
 import { HeroCarousel } from "./lib/infrastructure/payload/collections/HeroCarousel.ts";
+import { Reviews } from "./lib/infrastructure/payload/collections/Reviews.ts";
 import { SiteSettingsOrchid, SiteSettingsKidography, SiteSettingsLegacy } from "./lib/infrastructure/payload/globals/SiteSettings.ts";
 
 /**
@@ -26,7 +27,7 @@ export default buildConfig({
         // rely on dev-mode schema push, not the migration CLI).
         migrationDir: "migrations",
     }),
-    collections: [Blogs, Careers, Categories, Albums, GalleryMedia, HeroCarousel],
+    collections: [Blogs, Careers, Categories, Albums, GalleryMedia, HeroCarousel, Reviews],
     globals: [SiteSettingsOrchid, SiteSettingsKidography, SiteSettingsLegacy],
     typescript: {
         outputFile: "lib/infrastructure/payload/payload-types.ts",
