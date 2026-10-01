@@ -12,25 +12,25 @@ interface TeamMember {
 const TEAM_MEMBERS: TeamMember[] = [
     {
         id: "1",
-        name: "Blank",
+        name: "Bappa Saha",
         role: "Photographer",
         image: "/teams/photographer.jpeg",
     },
     {
         id: "2",
-        name: "Blank",
+        name: "Subhayu Pal",
         role: "Cinematorgrapher",
         image: "/teams/cinematographer.jpeg",
     },
     {
         id: "3",
-        name: "Blank",
+        name: "Sneha Samanta",
         role: "Photo Editor",
         image: "/teams/photo-editor.jpeg",
     },
     {
         id: "4",
-        name: "Blank",
+        name: "Keya Bairagi",
         role: "Co-ordinator",
         image: "/teams/co-ordinator.jpeg",
     },
@@ -39,6 +39,24 @@ const TEAM_MEMBERS: TeamMember[] = [
         name: "Blank",
         role: "Creative",
         image: "/teams/creative.jpeg",
+    },
+    {
+        id: "6",
+        name: "Blank",
+        role: "Marketing and Customer Relationship",
+        image: "/teams/relation.png",
+    },
+    {
+        id: "7",
+        name: "Amit Patra",
+        role: "Senior Video Editor",
+        image: "/teams/video-editor.jpeg",
+    },
+    {
+        id: "8",
+        name: "Prithwi Paul",
+        role: "Blank",
+        image: "/teams/unknown.jpeg",
     },
     // {
     //     id: "6",
