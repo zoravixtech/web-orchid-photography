@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import SectionHeader from "@/components/SectionHeader";
 
@@ -13,42 +13,98 @@ interface OfficeImage {
 const OFFICE_IMAGES: OfficeImage[] = [
     {
         id: "1",
-        url: "https://images.prismic.io/chobirkotha2/Zw4-DoF3NbkBXcPv_office1.jpeg?auto=format,compress&rect=2,0,4156,2628&w=1400",
+        url: "/office/IMG_20261003_180829386_HDR.jpg.jpeg",
         title: "Main Client Reception Lounge",
     },
     {
         id: "2",
-        url: "https://images.prismic.io/chobirkotha2/Zw4-DoF3NbkBXcPu_office2.jpeg?auto=format,compress&rect=0,1,4160,2771&w=1400",
-        title: "Creative Editing Suite & Workstation",
+        url: "/office/IMG_20261003_180741758.jpg.jpeg",
+        title: "Client Consultation & Discussion Area",
     },
     {
         id: "3",
-        url: "https://images.prismic.io/chobirkotha2/Zw4-DYF3NbkBXcPs_office3.jpeg?auto=format,compress&rect=0,1,4160,2771&w=1400",
-        title: "Photography Studio & Equipment Hub",
+        url: "/office/IMG_0096.jpg",
+        title: "Studio Lounge & Workspace",
     },
     {
         id: "4",
-        url: "https://images.prismic.io/chobirkotha2/Zw4-DIF3NbkBXcPq_office4.jpeg?auto=format,compress&rect=0,1,4160,2771&w=1400",
-        title: "Client Consultation & Storyboarding Area",
+        url: "/office/IMG_0098.jpg",
+        title: "Wedding Memories & Portrait Gallery",
+    },
+    {
+        id: "5",
+        url: "/office/IMG_0097.jpg",
+        title: "Fine-Art Photo Wall & Discussion Nook",
+    },
+    {
+        id: "6",
+        url: "/office/IMG_0104.jpg",
+        title: "Signature Portrait & Gallery Display",
+    },
+    {
+        id: "7",
+        url: "/office/IMG_0101.jpg",
+        title: "Indoor Photography Studio & Lighting Bay",
+    },
+    {
+        id: "8",
+        url: "/office/IMG_0103.jpg",
+        title: "Studio Backdrop & Chandelier Setup",
+    },
+    {
+        id: "9",
+        url: "/office/IMG_20261003_175725398_HDR.jpg.jpeg",
+        title: "Professional Camera & Gear Desk",
+    },
+    {
+        id: "10",
+        url: "/office/IMG_20261003_180410793.jpg.jpeg",
+        title: "Dual-Screen Creative Editing Suite",
+    },
+    {
+        id: "11",
+        url: "/office/IMG_20261003_180226362.jpg.jpeg",
+        title: "Post-Production Workstations Lab",
+    },
+    {
+        id: "12",
+        url: "/office/IMG_20261003_180448805.jpg.jpeg",
+        title: "Creative Floor & Production Hub",
+    },
+    {
+        id: "13",
+        url: "/office/IMG_20261003_180541136.jpg.jpeg",
+        title: "Cinematography & Color Grading Desk",
     },
 ];
 
 export default function AboutOfficeSection() {
     const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
 
-    const handlePrev = () => {
+    const handlePrev = useCallback(() => {
         if (activeImageIndex === null) return;
         setActiveImageIndex((prev) =>
             prev === 0 ? OFFICE_IMAGES.length - 1 : (prev ?? 0) - 1
         );
-    };
+    }, [activeImageIndex]);
 
-    const handleNext = () => {
+    const handleNext = useCallback(() => {
         if (activeImageIndex === null) return;
         setActiveImageIndex((prev) =>
             prev === OFFICE_IMAGES.length - 1 ? 0 : (prev ?? 0) + 1
         );
-    };
+    }, [activeImageIndex]);
+
+    useEffect(() => {
+        if (activeImageIndex === null) return;
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setActiveImageIndex(null);
+            if (e.key === "ArrowLeft") handlePrev();
+            if (e.key === "ArrowRight") handleNext();
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [activeImageIndex, handlePrev, handleNext]);
 
     return (
         <section className="py-16 sm:py-24 bg-white text-slate-800">
@@ -63,7 +119,7 @@ export default function AboutOfficeSection() {
                 />
 
                 {/* Office Photos Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {OFFICE_IMAGES.map((item, index) => (
                         <div
                             key={item.id}
@@ -75,7 +131,7 @@ export default function AboutOfficeSection() {
                                 alt={item.title}
                                 fill
                                 className="object-cover transition-transform duration-700 group-hover:scale-110"
-                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                             />
                             {/* Dark Gradient Overlay */}
                             <div className="absolute inset-0 bg-linear-to-t from-slate-950/80 via-slate-950/20 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-300 flex flex-col justify-end p-4 text-white">
@@ -101,7 +157,12 @@ export default function AboutOfficeSection() {
 
             {/* Lightbox Image Preview Modal */}
             {activeImageIndex !== null && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-fadeIn">
+                <div 
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget) setActiveImageIndex(null);
+                    }}
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-fadeIn"
+                >
                     {/* Close Button */}
                     <button
                         onClick={() => setActiveImageIndex(null)}

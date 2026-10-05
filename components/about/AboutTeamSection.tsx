@@ -36,7 +36,7 @@ const TEAM_MEMBERS: TeamMember[] = [
     },
     {
         id: "5",
-        name: "Blank",
+        name: "Kallol Das",
         role: "Creative",
         image: "/teams/creative.jpeg",
     },
