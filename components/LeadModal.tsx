@@ -145,7 +145,7 @@ export default function LeadModal() {
                         {/* LEFT COLUMN: Cover Image with 0 Padding */}
                         <div className="hidden md:block md:col-span-5 relative bg-slate-900 min-h-115">
                             <img
-                                src="/login_cover.jpg"
+                                src="/login_cover.webp"
                                 alt="The Orchid Photography Cover"
                                 className="absolute inset-0 w-full h-full object-cover"
                             />

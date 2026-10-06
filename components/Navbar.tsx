@@ -9,9 +9,9 @@ import { getAudienceFromHostname, getKidographyDomain, getWeddingDomain, type Au
 // Hardcoded per-org logo assets (task: logo is no longer admin-editable).
 // Orchid has a light-text variant for the transparent/dark-overlay navbar
 // state; Kidography only has the one mark, used everywhere.
-const ORCHID_LOGO = "/orchid-logo.png";
-const ORCHID_LOGO_DARK_BG = "/orchid-logo-2.png";
-const KIDOGRAPHY_LOGO = "/kidography-logo.png";
+const ORCHID_LOGO = "/orchid-logo.webp";
+const ORCHID_LOGO_DARK_BG = "/orchid-logo-2.webp";
+const KIDOGRAPHY_LOGO = "/kidography-logo.webp";
 
 const noopSubscribe = () => () => { };
 

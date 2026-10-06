@@ -6,8 +6,8 @@ import type { SocialLinks } from '@/lib/types'
 // Hardcoded per-org logo assets (task: logo is no longer admin-editable).
 // The footer background is always dark, so Orchid always uses its
 // light-text logo variant here.
-const ORCHID_LOGO_DARK_BG = '/orchid-logo-2.png'
-const KIDOGRAPHY_LOGO = '/kidography-logo.png'
+const ORCHID_LOGO_DARK_BG = '/orchid-logo-2.webp'
+const KIDOGRAPHY_LOGO = '/kidography-logo.webp'
 
 export default function Footer({
   org,

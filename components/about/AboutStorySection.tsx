@@ -12,7 +12,7 @@ export default function AboutStorySection() {
                     <div className="lg:col-span-6 relative group">
                         <div className="relative aspect-4/3 w-full rounded-3xl overflow-hidden shadow-2xl border border-purple-100/80">
                             <Image
-                                src="https://images.prismic.io/chobirkotha2/ZwluB4F3NbkBXWlZ_Chobirkothagroupphoto-23.jpg?auto=format%2Ccompress&rect=22%2C0%2C5998%2C4027&w=1200&fit=max"
+                                src="/teams/teams.webp"
                                 alt="The Orchid Photography Team Group"
                                 fill
                                 className="object-cover transition-transform duration-700 group-hover:scale-105"

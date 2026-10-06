@@ -13,67 +13,67 @@ interface OfficeImage {
 const OFFICE_IMAGES: OfficeImage[] = [
     {
         id: "1",
-        url: "/office/IMG_20261003_180829386_HDR.jpg.jpeg",
+        url: "/office/IMG_20261003_180829386_HDR.webp",
         title: "Main Client Reception Lounge",
     },
     {
         id: "2",
-        url: "/office/IMG_20261003_180741758.jpg.jpeg",
+        url: "/office/IMG_20261003_180741758.webp",
         title: "Client Consultation & Discussion Area",
     },
     {
         id: "3",
-        url: "/office/IMG_0096.jpg",
+        url: "/office/IMG_0096.webp",
         title: "Studio Lounge & Workspace",
     },
     {
         id: "4",
-        url: "/office/IMG_0098.jpg",
+        url: "/office/IMG_0098.webp",
         title: "Wedding Memories & Portrait Gallery",
     },
     {
         id: "5",
-        url: "/office/IMG_0097.jpg",
+        url: "/office/IMG_0097.webp",
         title: "Fine-Art Photo Wall & Discussion Nook",
     },
     {
         id: "6",
-        url: "/office/IMG_0104.jpg",
+        url: "/office/IMG_0104.webp",
         title: "Signature Portrait & Gallery Display",
     },
     {
         id: "7",
-        url: "/office/IMG_0101.jpg",
+        url: "/office/IMG_0101.webp",
         title: "Indoor Photography Studio & Lighting Bay",
     },
     {
         id: "8",
-        url: "/office/IMG_0103.jpg",
+        url: "/office/IMG_0103.webp",
         title: "Studio Backdrop & Chandelier Setup",
     },
     {
         id: "9",
-        url: "/office/IMG_20261003_175725398_HDR.jpg.jpeg",
+        url: "/office/IMG_20261003_175725398_HDR.webp",
         title: "Professional Camera & Gear Desk",
     },
     {
         id: "10",
-        url: "/office/IMG_20261003_180410793.jpg.jpeg",
+        url: "/office/IMG_20261003_180410793.webp",
         title: "Dual-Screen Creative Editing Suite",
     },
     {
         id: "11",
-        url: "/office/IMG_20261003_180226362.jpg.jpeg",
+        url: "/office/IMG_20261003_180226362.webp",
         title: "Post-Production Workstations Lab",
     },
     {
         id: "12",
-        url: "/office/IMG_20261003_180448805.jpg.jpeg",
+        url: "/office/IMG_20261003_180448805.webp",
         title: "Creative Floor & Production Hub",
     },
     {
         id: "13",
-        url: "/office/IMG_20261003_180541136.jpg.jpeg",
+        url: "/office/IMG_20261003_180541136.webp",
         title: "Cinematography & Color Grading Desk",
     },
 ];
@@ -109,7 +109,7 @@ export default function AboutOfficeSection() {
     return (
         <section className="py-16 sm:py-24 bg-white text-slate-800">
             <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12">
-                
+
                 {/* Section Header */}
                 <SectionHeader
                     subtitle="OUR WORKSPACE"
@@ -129,6 +129,7 @@ export default function AboutOfficeSection() {
                             <Image
                                 src={item.url}
                                 alt={item.title}
+                                loading="eager"
                                 fill
                                 className="object-cover transition-transform duration-700 group-hover:scale-110"
                                 sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -142,7 +143,7 @@ export default function AboutOfficeSection() {
                                     {item.title}
                                 </h4>
                             </div>
-                            
+
                             {/* Zoom Icon Badge */}
                             <div className="absolute top-3 right-3 p-2 rounded-full bg-slate-900/60 backdrop-blur-md text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -157,7 +158,7 @@ export default function AboutOfficeSection() {
 
             {/* Lightbox Image Preview Modal */}
             {activeImageIndex !== null && (
-                <div 
+                <div
                     onClick={(e) => {
                         if (e.target === e.currentTarget) setActiveImageIndex(null);
                     }}

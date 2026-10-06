@@ -11,113 +11,53 @@ interface TeamMember {
 
 const TEAM_MEMBERS: TeamMember[] = [
     {
+        id: "5",
+        name: "Kallol Das",
+        role: "Co-Founder",
+        image: "/teams/creative.webp",
+    },
+    {
+        id: "6",
+        name: "Srijan Chakraborty",
+        role: "Co-Founder",
+        image: "/teams/relation.webp",
+    },
+    {
         id: "1",
         name: "Bappa Saha",
         role: "Photographer",
-        image: "/teams/photographer.jpeg",
+        image: "/teams/photographer.webp",
     },
     {
         id: "2",
         name: "Subhayu Pal",
         role: "Cinematorgrapher",
-        image: "/teams/cinematographer.jpeg",
+        image: "/teams/cinematographer.webp",
     },
     {
         id: "3",
         name: "Sneha Samanta",
         role: "Photo Editor",
-        image: "/teams/photo-editor.jpeg",
+        image: "/teams/photo-editor.webp",
     },
     {
         id: "4",
         name: "Keya Bairagi",
         role: "Co-ordinator",
-        image: "/teams/co-ordinator.jpeg",
-    },
-    {
-        id: "5",
-        name: "Kallol Das",
-        role: "Creative",
-        image: "/teams/creative.jpeg",
-    },
-    {
-        id: "6",
-        name: "Blank",
-        role: "Marketing and Customer Relationship",
-        image: "/teams/relation.png",
+        image: "/teams/co-ordinator.webp",
     },
     {
         id: "7",
         name: "Amit Patra",
         role: "Senior Video Editor",
-        image: "/teams/video-editor.jpeg",
+        image: "/teams/video-editor.webp",
     },
     {
         id: "8",
         name: "Prithwi Paul",
-        role: "Blank",
-        image: "/teams/unknown.jpeg",
+        role: "Video Editor",
+        image: "/teams/video-editor-1.webp",
     },
-    // {
-    //     id: "6",
-    //     name: "Manash Ghosh",
-    //     role: "Senior Cinematographer",
-    //     image: "https://images.prismic.io/chobirkotha2/ZwlyRIF3NbkBXWpB_Chobirkothagroupphoto-29.jpg?auto=format%2Ccompress&rect=375%2C0%2C4032%2C4032&w=800",
-    // },
-    // {
-    //     id: "7",
-    //     name: "Utsab Sinha Roy",
-    //     role: "Photographer & Editor",
-    //     image: "https://images.prismic.io/chobirkotha2/ZwlyEIF3NbkBXWo1_Chobirkothagroupphoto-21.jpg?auto=format%2Ccompress&rect=1008%2C0%2C4032%2C4032&w=800",
-    // },
-    // {
-    //     id: "8",
-    //     name: "Debartha Karmakar",
-    //     role: "Event Photographer",
-    //     image: "https://images.prismic.io/chobirkotha2/ZwlyGoF3NbkBXWo2_Chobirkothagroupphoto-22.jpg?auto=format%2Ccompress&rect=318%2C0%2C3822%2C3822&w=800",
-    // },
-    // {
-    //     id: "9",
-    //     name: "Arun Das",
-    //     role: "Drone & Video Cinematographer",
-    //     image: "https://images.prismic.io/chobirkotha2/ZwlyKoF3NbkBXWo5_Chobirkothagroupphoto-25.jpg?auto=format%2Ccompress&rect=579%2C0%2C4032%2C4032&w=800",
-    // },
-    // {
-    //     id: "10",
-    //     name: "Dipayan Samaddar",
-    //     role: "Creative Photographer",
-    //     image: "https://images.prismic.io/chobirkotha2/ZyPfvK8jQArT0GN6_ARG_9753.JPG?auto=format%2Ccompress&rect=0%2C663%2C4032%2C4032&w=800",
-    // },
-    // {
-    //     id: "11",
-    //     name: "Sanchaita Bera",
-    //     role: "Candid Photographer & Colorist",
-    //     image: "https://images.prismic.io/chobirkotha2/ZwlyS4F3NbkBXWpD_Chobirkothagroupphoto-30.jpg?auto=format%2Ccompress&rect=977%2C0%2C3906%2C3906&w=800",
-    // },
-    // {
-    //     id: "12",
-    //     name: "Shaibal Mondal",
-    //     role: "Cinematographer",
-    //     image: "https://images.prismic.io/chobirkotha2/ZwlyJIF3NbkBXWo3_Chobirkothagroupphoto-24.jpg?auto=format%2Ccompress&rect=1008%2C0%2C4032%2C4032&w=800",
-    // },
-    // {
-    //     id: "13",
-    //     name: "Pradipta Chatterjee",
-    //     role: "Event Photographer",
-    //     image: "https://images.prismic.io/chobirkotha2/ZwlyA4F3NbkBXWox_Chobirkothagroupphoto-20.jpg?auto=format%2Ccompress&rect=583%2C0%2C4032%2C4032&w=800",
-    // },
-    // {
-    //     id: "14",
-    //     name: "Swarup Paramanik",
-    //     role: "Content Writer",
-    //     image: "https://images.prismic.io/chobirkotha2/Zwlx64F3NbkBXWou_Chobirkothagroupphoto-17.jpg?auto=format%2Ccompress&rect=206%2C0%2C4032%2C4032&w=800",
-    // },
-    // {
-    //     id: "15",
-    //     name: "Ardhendu Bank",
-    //     role: "Shoot & Event Organizer",
-    //     image: "https://images.prismic.io/chobirkotha2/Zwlx-YF3NbkBXWow_Chobirkothagroupphoto-19.jpg?auto=format%2Ccompress&rect=1325%2C0%2C4032%2C4032&w=800",
-    // },
 ];
 
 export default function AboutTeamSection() {
