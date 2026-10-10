@@ -8,8 +8,7 @@ interface PageBannerProps {
     imageAlt: string;
 }
 
-const DEFAULT_IMAGE =
-    "https://images.prismic.io/chobirkotha2/ZwwH8oF3NbkBXXt5_ARG_9438.jpg?auto=format,compress&rect=0,0,6017,4011&w=1920&h=1080";
+const DEFAULT_IMAGE = "/banner.webp";
 
 export default function PageBanner({ eyebrow, title, description, imageSrc = DEFAULT_IMAGE, imageAlt }: PageBannerProps) {
     return (

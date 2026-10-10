@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 
 const LOCAL_STORAGE_KEY = 'orchid_lead_submitted'
-const INTERVAL_MS = 10 * 1000 // 10 seconds
+const INTERVAL_MS = 60 * 1000 // 1 minute
+const INITIAL_INTERVAL_MS = 20 * 1000 // 1 minute
 
 export default function LeadModal() {
     const [isOpen, setIsOpen] = useState(false)
@@ -53,7 +54,7 @@ export default function LeadModal() {
             if (!currentCheck) {
                 setIsOpen(true)
             }
-        }, 10000)
+        }, INITIAL_INTERVAL_MS)
 
         startRecurringTimer()
 
