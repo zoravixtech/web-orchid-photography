@@ -15,17 +15,29 @@ function isDev(): boolean {
 
 export function getWeddingDomain(): string {
     return isDev()
-        ? process.env.NEXT_PUBLIC_WEDDING_DOMAIN_DEV || "theorchidphotography.localhost"
+        ? process.env.NEXT_PUBLIC_WEDDING_DOMAIN_DEV || "orchid.localhost"
         : process.env.NEXT_PUBLIC_WEDDING_DOMAIN || "theorchidphotography.com";
 }
 
 export function getKidographyDomain(): string {
     return isDev()
-        ? process.env.NEXT_PUBLIC_KIDOGRAPHY_DOMAIN_DEV || "kidography.theorchidphotography.localhost"
+        ? process.env.NEXT_PUBLIC_KIDOGRAPHY_DOMAIN_DEV || "kidography.localhost"
         : process.env.NEXT_PUBLIC_KIDOGRAPHY_DOMAIN || "kidography.theorchidphotography.com";
 }
 
 export function getAudienceFromHostname(hostname: string | null | undefined): Audience {
     const host = (hostname ?? "").toLowerCase().split(":")[0];
-    return host === getKidographyDomain().toLowerCase() ? "kidography" : "orchid";
+    const kidographyDev = (process.env.NEXT_PUBLIC_KIDOGRAPHY_DOMAIN_DEV || "kidography.localhost").toLowerCase().split(":")[0];
+    const kidographyProd = (process.env.NEXT_PUBLIC_KIDOGRAPHY_DOMAIN || "kidography.theorchidphotography.com").toLowerCase().split(":")[0];
+
+    if (
+        host === kidographyDev ||
+        host === kidographyProd ||
+        host === "kidography.localhost" ||
+        host === "kidography.theorchidphotography.localhost" ||
+        host.startsWith("kidography.")
+    ) {
+        return "kidography";
+    }
+    return "orchid";
 }

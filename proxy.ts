@@ -19,16 +19,39 @@ function isOrgScopedPath(pathname: string): boolean {
 
 export function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
-    if (!isOrgScopedPath(pathname)) return NextResponse.next();
-    if (getAudienceFromHostname(request.headers.get("host")) !== "kidography") {
-        return NextResponse.next();
+    const hostAudience = getAudienceFromHostname(request.headers.get("host"));
+    const isKidography = hostAudience === "kidography" || pathname.startsWith("/kidography");
+    const audience = isKidography ? "kidography" : "orchid";
+
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set("x-audience", audience);
+
+    // If on kidography subdomain and accessing an org-scoped path (e.g. /, /services, /gallery, /albums/...)
+    if (hostAudience === "kidography" && isOrgScopedPath(pathname)) {
+        const url = request.nextUrl.clone();
+        url.pathname = pathname === "/" ? "/kidography" : `/kidography${pathname}`;
+        return NextResponse.rewrite(url, {
+            request: {
+                headers: requestHeaders,
+            },
+        });
     }
 
-    const url = request.nextUrl.clone();
-    url.pathname = pathname === "/" ? "/kidography" : `/kidography${pathname}`;
-    return NextResponse.rewrite(url);
+    return NextResponse.next({
+        request: {
+            headers: requestHeaders,
+        },
+    });
 }
 
 export const config = {
-    matcher: ["/", "/services", "/albums", "/albums/:slug*", "/gallery"],
+    matcher: [
+        /*
+         * Match all request paths except:
+         * - _next/static, _next/image
+         * - api routes
+         * - static files (*.webp, *.png, *.jpg, *.jpeg, *.gif, *.svg, *.ico, *.wasm, etc.)
+         */
+        "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|mp4|webm|wasm)).*)",
+    ],
 };

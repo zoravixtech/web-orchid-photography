@@ -25,7 +25,7 @@ export default function Footer({
       className="bg-[#141b27] text-slate-300 pt-16 pb-0 relative overflow-hidden"
     >
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 pb-12 border-b border-slate-800/80">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 pb-12">
           {/* Column 1: Brand & Certifications */}
           <div className="flex flex-col items-start">
             {/* Logo */}
@@ -282,6 +282,43 @@ export default function Footer({
               </span>
             </div>
           </div>
+        </div>
+
+        {/* Divider with Center Logo Icon */}
+        <div className="relative flex items-center justify-center pt-2 pb-4">
+          <div className="flex-grow border-t border-slate-800/80" />
+          <div className="mx-4 flex items-center justify-center">
+            <svg
+              className="w-5 h-5 shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              strokeWidth="2.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M8.5 7.5L12 4L15.5 7.5" stroke="#E25141" />
+              <path d="M16.5 8.5L20 12L16.5 15.5" stroke="#F4B400" />
+              <path d="M15.5 16.5L12 20L8.5 16.5" stroke="#4285F4" />
+              <path d="M7.5 15.5L4 12L7.5 8.5" stroke="#34A853" />
+            </svg>
+          </div>
+          <div className="flex-grow border-t border-slate-800/80" />
+        </div>
+
+        {/* Growing with Zoravix */}
+        <div className="text-center pb-8">
+          <a
+            href="https://zoravix.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-slate-400 hover:text-purple-400 transition-colors font-medium tracking-wide"
+          >
+            <span>Growing with</span>
+            <span className="font-semibold text-slate-200 hover:text-white transition-colors">
+              Zoravix
+            </span>
+          </a>
         </div>
       </div>
 

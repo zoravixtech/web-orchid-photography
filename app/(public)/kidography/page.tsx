@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import HeroSlider from "@/components/HeroSlider";
 import AlbumsGridSection from "@/components/AlbumsGridSection";
 import FeaturedVideoSection from "@/components/FeaturedVideoSection";
@@ -10,6 +11,7 @@ import { getSiteSettings, getPinnedMedia, getHeroCarouselMedia } from "@/lib/dat
 import { getAlbums } from "@/lib/data/albums";
 import { getBlogs } from "@/lib/data/blogs";
 import { getPinnedReviews } from "@/lib/data/reviews";
+import { getAudienceFromHostname } from "@/lib/config/domain";
 
 // This is the kidography home page — served at "/" on the kidography
 // subdomain via a proxy rewrite (see proxy.ts), and also directly reachable
@@ -19,6 +21,9 @@ import { getPinnedReviews } from "@/lib/data/reviews";
 export const revalidate = 86400;
 
 export default async function KidographyPage() {
+    const headerList = await headers();
+    const isSubdomain = getAudienceFromHostname(headerList.get("host")) === "kidography";
+
     const [settings, albums, pinnedImages, heroImages, blogPosts, pinnedReviews] = await Promise.all([
         getSiteSettings("kidography"),
         getAlbums("kidography"),
@@ -36,7 +41,7 @@ export default async function KidographyPage() {
             {/* Albums Grid Section — click through to an album's own gallery page */}
             <AlbumsGridSection
                 albums={albums}
-                albumHrefBase="/kidography/albums"
+                albumHrefBase={isSubdomain ? "/albums" : "/kidography/albums"}
                 title="The Orchid Kidography"
                 description="Capturing Playful, Precious Childhood Moments, Serving Families All Over India"
             />
@@ -49,7 +54,7 @@ export default async function KidographyPage() {
                 images={pinnedImages}
                 subtitle="Specialized Kidography"
                 title="Capturing Pure Smiles & Timeless Memories"
-                showMoreHref="/kidography/gallery"
+                showMoreHref={isSubdomain ? "/gallery" : "/kidography/gallery"}
             />
 
             {/* Why We Are Rated Top Photographer Section */}

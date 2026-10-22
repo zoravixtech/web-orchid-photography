@@ -16,7 +16,10 @@ const KIDOGRAPHY_LOGO = "/kidography-logo.webp";
 const noopSubscribe = () => () => { };
 
 function getClientAudience(): Audience {
-    return getAudienceFromHostname(window.location.hostname);
+    if (typeof window !== "undefined" && window.location.pathname.startsWith("/kidography")) {
+        return "kidography";
+    }
+    return getAudienceFromHostname(typeof window !== "undefined" ? window.location.hostname : undefined);
 }
 
 function getServerAudience(): Audience {
@@ -25,9 +28,39 @@ function getServerAudience(): Audience {
 
 function getClientSwitchHref(): string {
     const detected = getClientAudience();
-    const targetHost = detected === "orchid" ? getKidographyDomain() : getWeddingDomain();
-    const port = window.location.port ? `:${window.location.port}` : "";
-    return `${window.location.protocol}//${targetHost}${port}/`;
+    const currentHost = typeof window !== "undefined" ? window.location.hostname : "";
+    const port = typeof window !== "undefined" && window.location.port ? `:${window.location.port}` : "";
+    const protocol = typeof window !== "undefined" ? window.location.protocol : "https:";
+
+    if (detected === "orchid") {
+        if (process.env.NEXT_PUBLIC_KIDOGRAPHY_DOMAIN && process.env.NODE_ENV !== "development") {
+            return `${protocol}//${process.env.NEXT_PUBLIC_KIDOGRAPHY_DOMAIN}${port}/`;
+        }
+        if (process.env.NODE_ENV === "development") {
+            return `${protocol}//${getKidographyDomain()}${port}/`;
+        }
+        if (currentHost.startsWith("orchid.")) {
+            const targetHost = currentHost.replace(/^orchid\./, "kidography.");
+            return `${protocol}//${targetHost}${port}/`;
+        }
+        if (currentHost && !currentHost.startsWith("kidography.")) {
+            const targetHost = `kidography.${currentHost}`;
+            return `${protocol}//${targetHost}${port}/`;
+        }
+        return `${protocol}//${getKidographyDomain()}${port}/`;
+    } else {
+        if (process.env.NEXT_PUBLIC_WEDDING_DOMAIN && process.env.NODE_ENV !== "development") {
+            return `${protocol}//${process.env.NEXT_PUBLIC_WEDDING_DOMAIN}${port}/`;
+        }
+        if (process.env.NODE_ENV === "development") {
+            return `${protocol}//${getWeddingDomain()}${port}/`;
+        }
+        if (currentHost.startsWith("kidography.")) {
+            const targetHost = currentHost.replace(/^kidography\./, "");
+            return `${protocol}//${targetHost}${port}/`;
+        }
+        return `${protocol}//${getWeddingDomain()}${port}/`;
+    }
 }
 
 function getServerSwitchHref(): string {

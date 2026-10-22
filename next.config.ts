@@ -30,8 +30,20 @@ if (storagePublicUrlBase) {
 // both so the dev server accepts requests for either. *.localhost resolves
 // to 127.0.0.1 out of the box on most systems, no /etc/hosts edit needed.
 const allowedDevOrigins = [
-  process.env.NEXT_PUBLIC_WEDDING_DOMAIN_DEV || "theorchidphotography.localhost",
-  process.env.NEXT_PUBLIC_KIDOGRAPHY_DOMAIN_DEV || "kidography.theorchidphotography.localhost",
+  "orchid.localhost",
+  "orchid.localhost:3000",
+  "kidography.localhost",
+  "kidography.localhost:3000",
+  "theorchidphotography.localhost",
+  "theorchidphotography.localhost:3000",
+  "kidography.theorchidphotography.localhost",
+  "kidography.theorchidphotography.localhost:3000",
+  "*.localhost",
+  "*.localhost:3000",
+  "localhost",
+  "localhost:3000",
+  ...(process.env.NEXT_PUBLIC_WEDDING_DOMAIN_DEV ? [process.env.NEXT_PUBLIC_WEDDING_DOMAIN_DEV] : []),
+  ...(process.env.NEXT_PUBLIC_KIDOGRAPHY_DOMAIN_DEV ? [process.env.NEXT_PUBLIC_KIDOGRAPHY_DOMAIN_DEV] : []),
 ];
 
 const nextConfig: NextConfig = {

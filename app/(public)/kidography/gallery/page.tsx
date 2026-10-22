@@ -1,11 +1,16 @@
+import { headers } from "next/headers";
 import PageBanner from "@/components/PageBanner";
 import CategoryTabbedGallery from "@/components/CategoryTabbedGallery";
 import { getCategories } from "@/lib/data/categories";
 import { getGalleryMedia } from "@/lib/data/settings";
+import { getAudienceFromHostname } from "@/lib/config/domain";
 
 export const revalidate = 86400;
 
 export default async function KidographyGalleryPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
+    const headerList = await headers();
+    const isSubdomain = getAudienceFromHostname(headerList.get("host")) === "kidography";
+
     const { category } = await searchParams;
     const categories = await getCategories("kidography");
     const activeCategoryId = category && categories.some((c) => c.id === category) ? category : "all";
@@ -32,7 +37,7 @@ export default async function KidographyGalleryPage({ searchParams }: { searchPa
                 categories={categories}
                 activeCategoryId={activeCategoryId}
                 images={images}
-                basePath="/kidography/gallery"
+                basePath={isSubdomain ? "/gallery" : "/kidography/gallery"}
             />
         </div>
     );
